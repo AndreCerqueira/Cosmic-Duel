@@ -188,6 +188,9 @@ namespace Cards.View
                 return false;
 
             if (hitInfo.collider == null || !hitInfo.collider.CompareTag(DROP_TARGET_TAG)) return false;
+            
+            // check if have energy to SelfMatchPlayer.Energy -= playCardGA.CardView.Card.Cost;
+            if (SelfMatchPlayer.Energy < GetComponent<CardView>().Card.Cost) return false;
 
             // check if hitInfo have EnemyView component
             // var enemyView = hitInfo.collider.GetComponent<EnemyView>();

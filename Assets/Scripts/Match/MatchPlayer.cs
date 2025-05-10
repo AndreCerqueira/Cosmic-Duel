@@ -26,7 +26,7 @@ namespace Match
         public int Energy { get; set; }
         
         
-        public event Action OnEnergyChanged; 
+        public event Action<int> OnEnergyChanged; 
         
         
         public MatchPlayer(DeckDataSO deckData, string name, int health)
@@ -34,7 +34,7 @@ namespace Match
             Health = health;
             MaxHealth = health;
             Armor = 0;
-            Energy = 3;
+            Energy = 0;
             _deckData = deckData;
             Name = name;
             Deck = new Deck(_deckData);
@@ -85,8 +85,17 @@ namespace Match
         public void GainEnergy(int amount)
         {
             Energy += amount;
-            OnEnergyChanged?.Invoke();
+            OnEnergyChanged?.Invoke(Energy);
             Debug.Log($"{Name} gained {amount} energy. Total energy: {Energy}");
+        }
+        
+        public void SpendEnergy(int amount)
+        {
+            Energy -= amount;
+            if (Energy < 0) Energy = 0;
+            
+            OnEnergyChanged?.Invoke(Energy);
+            Debug.Log($"{Name} spent {amount} energy. Remaining energy: {Energy}");
         }
     }
 }

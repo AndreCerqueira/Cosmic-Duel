@@ -52,6 +52,9 @@ namespace Cards.Systems
             
             SelectedObjectWithCard = playCardGA.Target;
             
+            // remove energy cost from player
+            SelfMatchPlayer.SpendEnergy(playCardGA.CardView.Card.Cost);
+            
             // Get effects from the card and apply them
             var cardEffects = playCardGA.CardView.Card.Effects;
             

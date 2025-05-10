@@ -39,6 +39,8 @@ namespace Project.Runtime.Scripts.Game.Matches
             
             SelfPlayerController = player;
             
+            player.MatchPlayer.OnEnergyChanged += EnergySystem.Instance.UpdateEnergyText;
+            
             _match = new Match(player.MatchPlayer, enemy);
 
             StartMatch();
@@ -49,6 +51,7 @@ namespace Project.Runtime.Scripts.Game.Matches
             _handView.Setup(_match.SelfPlayer.Hand);
             
             SelfPlayer.DrawStartingHand();
+            SelfPlayer.GainEnergy(3);
         }
     }
 }

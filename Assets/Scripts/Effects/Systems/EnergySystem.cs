@@ -6,7 +6,7 @@ using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 
-public class EnergySystem : Singleton<MonoBehaviour>
+public class EnergySystem : Singleton<EnergySystem>
 {
     private static MatchPlayer SelfMatchPlayer => MatchController.Instance.SelfPlayer;
     
