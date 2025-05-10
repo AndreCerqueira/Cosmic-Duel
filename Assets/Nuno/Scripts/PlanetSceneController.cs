@@ -4,7 +4,7 @@ using TMPro;
 public class PlanetSceneController : MonoBehaviour
 {
     [SerializeField] private TextMeshPro difficultyLabel;
-    [SerializeField] private FuelSystem fuel;   // se também gastas fuel aqui
+    //[SerializeField] private FuelSystem fuel;   // se também gastas fuel aqui
 
     private void Start()
     {
@@ -19,7 +19,7 @@ public class PlanetSceneController : MonoBehaviour
 
     public void OnBackButton()
     {
-        GameManager.Instance.currentFuel = fuel.CurrentFuel;  // se usou combustível aqui
+        //GameManager.Instance.currentFuel = fuel.CurrentFuel;  // se usou combustível aqui
         GameManager.Instance.ExitPlanet();
     }
 }

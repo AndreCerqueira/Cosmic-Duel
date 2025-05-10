@@ -1,21 +1,25 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
+using System;
 
 public class ShipMover : MonoBehaviour
 {
     [Header("Velocidade (unidades / segundo)")]
-    [SerializeField] private float minSpeed = 3f;      // destino colado à nave
+    [SerializeField] private float minSpeed = 3f;      // destino colado Ã  nave
     [SerializeField] private float maxSpeed = 10f;     // destino no limite do mapa
 
     [Header("Factor de escala")]
-    [Tooltip("Distância que resulta em maxSpeed. Se 0 usa a diagonal da câmara.")]
+    [Tooltip("DistÃ¢ncia que resulta em maxSpeed. Se 0 usa a diagonal da cÃ¢mara.")]
     [SerializeField] private float referenceDistance = 15f;
 
     private Coroutine currentMove;
+    private Action onArrive;
 
     /* ---------- API ---------- */
-    public void MoveTo(Vector3 destination)
+    public void MoveTo(Vector3 destination, Action arriveCallback)
     {
+        onArrive = arriveCallback;
+
         if (currentMove != null) StopCoroutine(currentMove);
         currentMove = StartCoroutine(MoveRoutine(destination));
     }
@@ -23,26 +27,25 @@ public class ShipMover : MonoBehaviour
     /* ---------- corrotina ---------- */
     private IEnumerator MoveRoutine(Vector3 target)
     {
-        while (true)
+        while (Vector3.Distance(transform.position, target) > 0.01f)
         {
             float dist = Vector3.Distance(transform.position, target);
-            if (dist < 0.01f) break;
-
-            float curSpeed = CalculateSpeed(dist);
+            float speed = Mathf.Lerp(minSpeed, maxSpeed,
+                              Mathf.Clamp01(dist / referenceDistance));
             transform.position = Vector3.MoveTowards(
-                                     transform.position,
-                                     target,
-                                     curSpeed * Time.deltaTime);
-
+                                     transform.position, target, speed * Time.deltaTime);
             yield return null;
         }
-        transform.position = target;
+
+        transform.position = target;   // â· garante posiÃ§Ã£o exacta
+        onArrive?.Invoke();            // â¸ avisa quem chamou
+
     }
 
-    /* ---------- lógica de velocidade ---------- */
+    /* ---------- lÃ³gica de velocidade ---------- */
     private float CalculateSpeed(float distance)
     {
-        // Se referenceDistance = 0, calcula automáticamente diagonal da câmara
+        // Se referenceDistance = 0, calcula automÃ¡ticamente diagonal da cÃ¢mara
         float refDist = (referenceDistance > 0)
                         ? referenceDistance
                         : GetCameraDiagonal();
@@ -54,7 +57,7 @@ public class ShipMover : MonoBehaviour
         return Mathf.Lerp(minSpeed, maxSpeed, t);
 
         // Quer curva exponencial? troca por:
-        // return Mathf.Lerp(minSpeed, maxSpeed, t * t);      // acelera mais devagar no início
+        // return Mathf.Lerp(minSpeed, maxSpeed, t * t);      // acelera mais devagar no inÃ­cio
     }
 
     private float GetCameraDiagonal()
@@ -63,6 +66,6 @@ public class ShipMover : MonoBehaviour
 
         float h = Camera.main.orthographicSize * 2f;
         float w = h * Camera.main.aspect;
-        return Mathf.Sqrt(w * w + h * h);   // diagonal visível
+        return Mathf.Sqrt(w * w + h * h);   // diagonal visÃ­vel
     }
 }

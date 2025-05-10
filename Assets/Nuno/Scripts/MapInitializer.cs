@@ -26,7 +26,10 @@ public class MapInitializer : MonoBehaviour
 
             // esconde ícone se já concluído
             if (st.completed)
+            {
+                p.MarkCompleted();
                 p.HideDifficultyIcon();
+            }
         }
 
         // repõe combustível no slider

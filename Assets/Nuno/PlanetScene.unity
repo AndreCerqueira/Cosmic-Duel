@@ -365,7 +365,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   difficultyLabel: {fileID: 1675358654}
-  fuel: {fileID: 0}
 --- !u!4 &1128089810
 Transform:
   m_ObjectHideFlags: 0

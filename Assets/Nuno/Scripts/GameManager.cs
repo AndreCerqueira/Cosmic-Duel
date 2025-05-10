@@ -1,3 +1,4 @@
+using MoreMountains.Feedbacks;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,6 +10,9 @@ public class GameManager : MonoBehaviour
     [Header("Nomes das cenas")]
     [SerializeField] private string mapScene = "MapScene";
     [SerializeField] private string planetScene = "PlanetScene";
+
+    [SerializeField] private MMF_Player _changeToPlanetSceneFeedback;
+    [SerializeField] private MMF_Player _changeToMapSceneFeedback;
 
     /* --------- dados persistentes --------- */
     [System.Serializable]
@@ -39,7 +43,7 @@ public class GameManager : MonoBehaviour
     public void EnterPlanet(int index)
     {
         CurrentPlanetIndex = index;
-        SceneManager.LoadScene(planetScene);
+        _changeToPlanetSceneFeedback?.PlayFeedbacks();
     }
 
     public void ExitPlanet()
@@ -47,6 +51,6 @@ public class GameManager : MonoBehaviour
         if (CurrentPlanetState != null)
             CurrentPlanetState.completed = true;
 
-        SceneManager.LoadScene(mapScene);
+        _changeToMapSceneFeedback?.PlayFeedbacks();
     }
 }

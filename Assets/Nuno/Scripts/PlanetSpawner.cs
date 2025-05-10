@@ -2,9 +2,8 @@
 using UnityEngine;
 using TMPro;
 
-/// Instancia planetas em posições aleatórias dentro da câmara,
-/// respeitando um padding às bordas. Só cria se ainda não existirem
-/// estados guardados no GameManager.
+/// Gera planetas no primeiro carregamento e, quando há dados
+/// persistentes no GameManager, apenas os recria visualmente.
 public class PlanetSpawner : MonoBehaviour
 {
     /* ---------- Inspector ---------- */
@@ -18,7 +17,7 @@ public class PlanetSpawner : MonoBehaviour
     [Header("Sprites possíveis")]
     [SerializeField] private List<Sprite> planetSprites;
 
-    [Header("Quantos planetas criar")]
+    [Header("Quantos planetas criar (primeira vez)")]
     [SerializeField] private int planetCount = 5;
 
     [Header("Distância mínima entre planetas")]
@@ -34,12 +33,12 @@ public class PlanetSpawner : MonoBehaviour
     [SerializeField] private FuelSystem fuelSystem;
     [SerializeField] private TextMeshPro fuelCostLabel;
 
-    [Header("Dificuldade")]
+    [Header("Dificuldade (primeira vez)")]
     [SerializeField] private int minDifficulty = 1;
     [SerializeField] private int maxDifficulty = 5;
     [SerializeField] private float mysteryChance = 0.2f;
 
-    /* ---------- rectângulo calculado ---------- */
+    /* ---------- limites calculados ---------- */
     private float minX, maxX, minY, maxY;
 
     /* ---------- Awake ---------- */
@@ -48,7 +47,7 @@ public class PlanetSpawner : MonoBehaviour
         if (targetCamera == null) targetCamera = Camera.main;
         if (targetCamera == null || !targetCamera.orthographic)
         {
-            Debug.LogError("PlanetSpawner: precisa de Camera ortográfica.");
+            Debug.LogError("[PlanetSpawner] Precisa de Camera ortográfica.");
             enabled = false; return;
         }
 
@@ -67,24 +66,30 @@ public class PlanetSpawner : MonoBehaviour
     {
         if (!enabled) return;
 
-        // ─── 0) já existem planetas guardados? então não cria nada ───
-        if (GameManager.Instance != null && GameManager.Instance.planets.Count > 0)
-            return;
+        GameManager gm = GameManager.Instance;
+        var states = gm.planets;
 
-        // ─── 1) validações ───
-        if (planetPrefab == null || planetSprites.Count == 0 || planetCount <= 0)
+        /* --- A) Já existem estados salvos: reconstruir apenas a parte visual --- */
+        if (states.Count > 0)
         {
-            Debug.LogWarning("PlanetSpawner: faltam referências ou planetCount <= 0.");
+            RebuildFromSavedData(states);
+            fuelSystem.SetFuel(gm.currentFuel);   // usa o método que criaste no FuelSystem
             return;
         }
 
-        // baralha sprites para não repetir padrão
+        /* --- B) Primeira vez: gerar planetas e registar estado --- */
+        if (planetPrefab == null || planetSprites.Count == 0 || planetCount <= 0)
+        {
+            Debug.LogWarning("[PlanetSpawner] Faltam referências ou planetCount <= 0.");
+            return;
+        }
+
         List<Sprite> shuffled = new List<Sprite>(planetSprites);
         Shuffle(shuffled);
 
-        // ─── 2) instanciar planetas ───
         for (int i = 0; i < planetCount; i++)
         {
+            // tenta achar posição livre
             Vector3 pos;
             bool overlapped; int attempts = 0;
 
@@ -95,42 +100,65 @@ public class PlanetSpawner : MonoBehaviour
             }
             while (overlapped && ++attempts < 20);
 
-            if (overlapped)
-            {
-                Debug.LogWarning($"PlanetSpawner: não encontrou espaço p/ planeta {i}.");
-                continue;
-            }
+            if (overlapped) continue;
 
-            // criar planeta
-            GameObject go = Instantiate(planetPrefab, pos, Quaternion.identity);
-
-            // dificuldade & mistério
             int diff = Random.Range(minDifficulty, maxDifficulty + 1);
-            bool mystery = Random.value < mysteryChance;
+            bool myst = Random.value < mysteryChance;
 
-            // índice real dentro do GameManager (antes de adicionar)
-            int planetIndex = GameManager.Instance.planets.Count;
-
-            // configurar script Planet
-            Planet p = go.GetComponent<Planet>();
-            p.PlanetIndex = planetIndex;
-            p.Setup(ship, line, costLabel, fuelSystem, fuelCostLabel, diff, mystery);
-
-            // sprite visual
-            go.GetComponent<SpriteRenderer>().sprite = shuffled[i % shuffled.Count];
-
-            // guardar estado persistente
-            GameManager.Instance.planets.Add(new GameManager.PlanetState
-            {
-                position = pos,
-                difficulty = diff,
-                mystery = mystery,
-                completed = false
-            });
+            CreateAndRegisterPlanet(pos, diff, myst, shuffled[i % shuffled.Count]);
         }
     }
 
-    /* ---------- helpers ---------- */
+    /* ---------- Reconstrução visual ---------- */
+    private void RebuildFromSavedData(List<GameManager.PlanetState> list)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            var st = list[i];
+
+            Planet p = CreatePlanetVisual(
+                st.position,
+                st.difficulty,
+                st.mystery,
+                planetSprites[i % planetSprites.Count],   // sprite qualquer
+                i);                                      // índice original
+
+            if (st.completed)
+                p.HideDifficultyIcon();
+        }
+    }
+
+    /* ---------- Cria só o GameObject ---------- */
+    private Planet CreatePlanetVisual(Vector3 pos, int diff, bool mystery,
+                                      Sprite sprite, int planetIndex)
+    {
+        GameObject go = Instantiate(planetPrefab, pos, Quaternion.identity);
+
+        Planet p = go.GetComponent<Planet>();
+        p.PlanetIndex = planetIndex;
+        p.Setup(ship, line, costLabel, fuelSystem, fuelCostLabel, diff, mystery);
+
+        go.GetComponent<SpriteRenderer>().sprite = sprite;
+        return p;
+    }
+
+    /* ---------- Cria e REGISTA no GameManager ---------- */
+    private void CreateAndRegisterPlanet(Vector3 pos, int diff, bool mystery, Sprite sprite)
+    {
+        GameManager gm = GameManager.Instance;
+
+        Planet p = CreatePlanetVisual(pos, diff, mystery, sprite, gm.planets.Count);
+
+        gm.planets.Add(new GameManager.PlanetState
+        {
+            position = pos,
+            difficulty = diff,
+            mystery = mystery,
+            completed = false
+        });
+    }
+
+    /* ---------- Utilidades ---------- */
     private Vector3 RandomPointInCamera() =>
         new Vector3(Random.Range(minX, maxX),
                     Random.Range(minY, maxY),

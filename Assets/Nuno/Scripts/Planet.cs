@@ -45,6 +45,9 @@ public class Planet : MonoBehaviour
     private bool isInitialized;
     public int PlanetIndex { get; set; }
 
+    private bool completed;
+
+
 
 
     private Material auraMat;
@@ -84,6 +87,7 @@ public class Planet : MonoBehaviour
     /* ---------- EVENTOS DE RATO ---------- */
     private void OnMouseEnter()
     {
+        if (completed) return;
         hovering = true;
         if (!selected) SetAura(hoverColor);
 
@@ -106,6 +110,8 @@ public class Planet : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if (completed) return;
+
         float distance = Vector3.Distance(transform.position, ship.transform.position);
 
         if (!fuel.TryConsumeForDistance(distance)) return;
@@ -117,11 +123,25 @@ public class Planet : MonoBehaviour
         selected = true;
         SetAura(selectedColor);
 
-        ship.MoveTo(transform.position);
+        ship.MoveTo(transform.position, OnShipArrived);
 
-        GameManager.Instance.EnterPlanet(PlanetIndex);
+        //GameManager.Instance.EnterPlanet(PlanetIndex);
 
         //RefreshInfo();                 // recalcula se quiseres valor exacto após clique
+    }
+
+    /* ---------- chegada da nave ---------- */
+    private void OnShipArrived()
+    {
+        GameManager.Instance.EnterPlanet(PlanetIndex);
+    }
+
+    /* ---------- chamado pelo MapInitializer depois de concluído ---------- */
+    public void MarkCompleted()
+    {
+        completed = true;
+        HideDifficultyIcon();              // ícone some
+        GetComponent<Collider2D>().enabled = false;   // ❸ bloqueia click/hover
     }
 
     /* ---------- LOOP ---------- */
