@@ -61,5 +61,11 @@ namespace Project.Runtime.Scripts.Game.Matches
             MatchPlayer.Armor += amount;
             _armorView.UpdateArmorText(MatchPlayer.Armor);
         }
+        
+        public void LoseAllArmor()
+        {
+            MatchPlayer.Armor = 0;
+            _armorView.UpdateArmorText(MatchPlayer.Armor);
+        }
     }
 }
