@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16b720e7c36657b4f833e90f0d4a43e1, type: 3}
+  m_Name: DamageTreasure
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: Effects
+      Entry: 6
+      Data: 
+  Id: 3
+  Name: teste
+  Description: All damage cards deal +1 damage.
+  Artwork: {fileID: 21300000, guid: b893b2641d14bf7419d21d6f93d03642, type: 3}
+  BorderType: 2
+  HaveRedDetail: 1
+  HaveBlueDetail: 0

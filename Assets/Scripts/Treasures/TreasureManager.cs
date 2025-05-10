@@ -1,54 +1,101 @@
+using System;
+using System.Collections.Generic;
+using DG.Tweening;
 using MoreMountains.Feedbacks;
+using Project.Runtime.Scripts.General;
+using Treasures;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TreasureManager : MonoBehaviour
+public class TreasureManager : Singleton<TreasureManager>
 {
-    [SerializeField] private HorizontalLayoutGroup _treasureLayoutGroup;
-    [SerializeField] private Button _gainHealthBonusButton;
-    [SerializeField] private Button _gainFuelBonusButton;
-    [SerializeField] private Button _gainArmorBonusButton;
-    [SerializeField] private Button _gainDamageBonusButton;
     [SerializeField] private MMF_Player _closeTreasurePopupFeedback;
     
-    private void Start()
-    {
-        _gainHealthBonusButton.onClick.AddListener(GainHealthBonus);
-        _gainFuelBonusButton.onClick.AddListener(GainFuelBonus);
-        _gainArmorBonusButton.onClick.AddListener(GainArmorBonus);
-        _gainDamageBonusButton.onClick.AddListener(GainDamageBonus);
-        
-        // disable all, enable 3 random
-        DisableAllTreasures();
-        EnableRandomTreasures(3);
-    }
+    [SerializeField] private TreasureDataSO[] _treasureDataSos;
     
-    private void DisableAllTreasures()
+    [SerializeField] private TreasureView[] _treasureViews;
+    
+    public void Setup()
     {
-        foreach (Transform child in _treasureLayoutGroup.transform)
+        Debug.Log("TreasureManager started");
+        SetupTreasures();
+    }
+
+    private void SetupTreasures()
+    {
+        var chosenTreasures = GetRandomTreasures(3);
+
+        for (int i = 0; i < _treasureViews.Length; i++)
         {
-            child.gameObject.SetActive(false);
+            var treasureData = chosenTreasures[i];
+
+            Action onClick = () =>
+            {
+                OnTreasureClicked(treasureData);
+            };
+            
+            _treasureViews[i].Setup(treasureData);
+            _treasureViews[i].InputHandler.Setup(onClick);
+            
+            Vector3 targetPosition = i switch
+            {
+                0 => new Vector3(-5f, 3f, 0f),
+                1 => new Vector3(0f, 3f, 0f),
+                2 => new Vector3(5f, 3f, 0f),
+                _ => Vector3.zero
+            };
+
+            // Move a carta para a posição com uma animação de 0.5 segundos
+            _treasureViews[i].transform.DOLocalMove(targetPosition, 0.5f).SetEase(Ease.OutQuad);
         }
     }
     
-    private void EnableRandomTreasures(int count)
+    private void OnTreasureClicked(TreasureDataSO data)
     {
-        int enabledCount = 0;
-        Transform[] children = new Transform[_treasureLayoutGroup.transform.childCount];
-        for (int i = 0; i < children.Length; i++)
+        DisableAllInputs();
+    
+        switch (data.Id)
         {
-            children[i] = _treasureLayoutGroup.transform.GetChild(i);
+            case 0: 
+                GainHealthBonus();
+                break;
+            case 1: 
+                GainFuelBonus();
+                break;
+            case 2:
+                GainArmorBonus();
+                break;
+            case 3:
+                GainDamageBonus();
+                break;
+            default:
+                DoMatchEnd();
+                break;
+        }
+    }
+
+    private void DisableAllInputs()
+    {
+        foreach (var view in _treasureViews)
+        {
+            view.InputHandler.enabled = false;
+        }
+    }
+
+    private TreasureDataSO[] GetRandomTreasures(int count)
+    {
+        var copyList = new List<TreasureDataSO>(_treasureDataSos);
+        var result = new TreasureDataSO[count];
+        var random = new System.Random();
+
+        for (int i = 0; i < count; i++)
+        {
+            int index = random.Next(copyList.Count);
+            result[i] = copyList[index];
+            copyList.RemoveAt(index);
         }
 
-        while (enabledCount < count)
-        {
-            int randomIndex = Random.Range(0, children.Length);
-            if (!children[randomIndex].gameObject.activeSelf)
-            {
-                children[randomIndex].gameObject.SetActive(true);
-                enabledCount++;
-            }
-        }
+        return result;
     }
     
     private void GainHealthBonus()
