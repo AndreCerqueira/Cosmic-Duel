@@ -23,7 +23,7 @@ public class EnemyView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _attack;
     [SerializeField] private ArmorView _armorView;
     [SerializeField] private Animator _animator;
-    [SerializeField] private Transform _canvasTransform;
+    [SerializeField] public Transform _canvasTransform;
     
     public Attack NextAttack { get; private set; }
     

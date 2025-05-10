@@ -91,29 +91,78 @@ namespace Match
         
         private List<EnemyView> SpawnEnemies()
         {
-            int enemyCount = UnityEngine.Random.Range(1, 4); // 1 to 3
             var selectedEnemies = new List<EnemyView>();
+            
+            // Decida se o inimigo gerado será um Boss ou Mobs comuns
+            bool spawnBoss = UnityEngine.Random.Range(0, 2) == 0; // 50% de chance de spawnar um Boss
 
-            for (int i = 0; i < enemyCount; i++)
+            if (spawnBoss)
             {
-                var enemyData = _allEnemies[UnityEngine.Random.Range(0, _allEnemies.Count)];
-                var spawnPoint = _enemySpawnPoints[i];
-
-                var enemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
-                //enemy.transform.position = spawnPoint.position;
-                enemy.Setup(enemyData);
-
-                enemy.OnEnemyDeath += () =>
+                // Se for um Boss, escolhe um único inimigo Boss e dobra o seu tamanho
+                var bossData = _allEnemies.FirstOrDefault(e => e.IsBoss);
+                if (bossData != null)
                 {
-                    if (selectedEnemies.All(e => e.IsDead))
-                    {
-                        _VictoryPopup.gameObject.SetActive(true);
-                        RemoveHandView();
-                        Debug.Log("You Win");
-                    }
-                };
+                    var spawnPoint = _enemySpawnPoints[0]; // O Boss é o único, então ele ocupa a primeira posição
+                    var boss = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
+                    boss.Setup(bossData);
+                    boss.transform.localScale *= 2; // Dobra o tamanho do Boss
+                    boss._canvasTransform.localScale /= 2; 
 
-                selectedEnemies.Add(enemy);
+                    selectedEnemies.Add(boss);
+                }
+                else
+                {
+                    // Caso não haja um Boss disponível, forçamos a criação de pelo menos um inimigo comum
+                    var commonEnemyData = _allEnemies.FirstOrDefault(e => !e.IsBoss); // Busca um inimigo comum
+                    if (commonEnemyData != null)
+                    {
+                        var spawnPoint = _enemySpawnPoints[0];
+                        var commonEnemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
+                        commonEnemy.Setup(commonEnemyData);
+                        selectedEnemies.Add(commonEnemy);
+                    }
+                }
+            }
+            else
+            {
+                // Caso contrário, spawnar de 1 a 3 mobs comuns
+                int enemyCount = UnityEngine.Random.Range(1, 4); // 1 to 3
+                for (int i = 0; i < enemyCount; i++)
+                {
+                    var enemyData = _allEnemies[UnityEngine.Random.Range(0, _allEnemies.Count)];
+                    
+                    // Verifica se o inimigo não é um Boss
+                    if (enemyData.IsBoss) continue; // Não deve spawnar um Boss aqui
+
+                    var spawnPoint = _enemySpawnPoints[i];
+                    var enemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
+                    enemy.Setup(enemyData);
+
+                    enemy.OnEnemyDeath += () =>
+                    {
+                        if (selectedEnemies.All(e => e.IsDead))
+                        {
+                            _VictoryPopup.gameObject.SetActive(true);
+                            RemoveHandView();
+                            Debug.Log("You Win");
+                        }
+                    };
+
+                    selectedEnemies.Add(enemy);
+                }
+            }
+
+            // Caso a lista de inimigos ainda esteja vazia, força a criação de pelo menos um inimigo comum
+            if (selectedEnemies.Count == 0)
+            {
+                var commonEnemyData = _allEnemies.FirstOrDefault(e => !e.IsBoss);
+                if (commonEnemyData != null)
+                {
+                    var spawnPoint = _enemySpawnPoints[0];
+                    var commonEnemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
+                    commonEnemy.Setup(commonEnemyData);
+                    selectedEnemies.Add(commonEnemy);
+                }
             }
 
             return selectedEnemies;

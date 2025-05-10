@@ -15,6 +15,7 @@ namespace Characters.Enemies
         public int BaseAttack;
         public float Altura;
         public bool needFlip;
+        public bool IsBoss;
         
         public AnimatorOverrideController EnemyAnimator;
     }
