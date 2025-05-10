@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
+public enum BorderType
+{
+    Copper,
+    Silver,
+    Golden
+}
+
 namespace Cards.Data
 {
     [CreateAssetMenu(fileName = "New Card", menuName = "Card")]
@@ -13,6 +20,10 @@ namespace Cards.Data
         public new string Name;
         public string Description;
         public Sprite Artwork;
+        public BorderType BorderType;
+        
+        public bool HaveRedDetail;
+        public bool HaveBlueDetail;
         
         [Title("Stats")]
 

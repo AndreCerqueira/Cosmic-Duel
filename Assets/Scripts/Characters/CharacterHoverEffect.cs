@@ -9,7 +9,7 @@ namespace Characters
         private const float PULSE_SPEED = 3f;
         private const float PULSE_INTENSITY = 0.5f;
     
-        private readonly Color _hoverColor = new(0.8f, 0.8f, 0.8f);
+        private readonly Color _hoverColor = new(0.6f, 0.6f, 0.6f);
         private readonly Color _availableColor = new(0.6f, 0.8627f, 0.4627f);
         private readonly Color _confirmColor = new(0.878f, 0.827f, 0.309f);
     

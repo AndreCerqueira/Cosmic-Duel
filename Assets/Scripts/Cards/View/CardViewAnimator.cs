@@ -66,8 +66,10 @@ namespace Cards.View
         {
             _transform.DOComplete();
             _wrapper.DOComplete();
-
-            _transform.SetParent(newParent);
+            
+            // find in the new parent a obj named CardParent
+            var cardParent = newParent.Find("CardParent");
+            _transform.SetParent(cardParent);
     
             var newLocalRotation = Quaternion.Euler(0f, 0f, 0f);
             var newLocalPosition = new Vector3(0f, 0f, 0f);

@@ -55,6 +55,8 @@ public class EnemyView : MonoBehaviour
             _artwork.flipX = true;
         
         _animator.runtimeAnimatorController = EnemyData.EnemyAnimator;
+        
+        _artwork.color = AlienColorPalette.Instance.GetRandomColor();
 
         GenerateNextAttack();
     }

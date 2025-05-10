@@ -12,6 +12,10 @@ namespace Cards.Models
         public string Description => _data.Description;
         public Sprite Artwork => _data.Artwork;
         
+        public BorderType BorderType => _data.BorderType;
+        public bool HaveRedDetail => _data.HaveRedDetail;
+        public bool HaveBlueDetail => _data.HaveBlueDetail;
+        
         public List<EffectPlain> Effects => _data.Effects;
         
         public int Cost { get; private set; }

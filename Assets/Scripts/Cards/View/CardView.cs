@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Cards.Models;
 using Match;
@@ -14,12 +15,24 @@ namespace Cards.View
         
         [NonSerialized] public CardInputHandler InputHandler;
         
+        [Header("Borders")]
+        [SerializeField] private Sprite _goldBorder;
+        [SerializeField] private Sprite _silverBorder;
+        [SerializeField] private Sprite _bronzeBorder;
+        
+        [Header("Card")]
+        
         [SerializeField] private TMP_Text _name;
         [SerializeField] private TMP_Text _description;
-        [SerializeField] private TMP_Text _energyCost;
         [SerializeField] private SpriteRenderer _artwork;
+        [SerializeField] private SpriteRenderer _border;
         [SerializeField] private GameObject _wrapper;
         [SerializeField] private GameObject _outline;
+        
+        [SerializeField] private GameObject _redDetail;
+        [SerializeField] private GameObject _blueDetail;
+        
+        [SerializeField] private List<Transform> _costs; // in order
         
         public Card Card { get; private set; }
         
@@ -46,7 +59,21 @@ namespace Cards.View
             _name.text = card.Name;
             _description.text = FormatDescription(card.Description);
             
-            _energyCost.text = card.Cost.ToString();
+            for (int i = 0; i < _costs.Count; i++)
+            {
+                _costs[i].gameObject.SetActive(i == card.Cost);
+            }
+            
+            _border.sprite = card.BorderType switch
+            {
+                BorderType.Golden => _goldBorder,
+                BorderType.Silver => _silverBorder,
+                BorderType.Copper => _bronzeBorder,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            
+            _redDetail.SetActive(card.HaveRedDetail);
+            _blueDetail.SetActive(card.HaveBlueDetail);
             
             _artwork.sprite = card.Artwork;
             
@@ -73,7 +100,7 @@ namespace Cards.View
             var pattern = @"\{keyword:([^{}]+?)\}";
             description = Regex.Replace(description, pattern, "<color=#DDBE78>$1</color>");
             description = description.Replace(@"\n", "\n");
-            description = ReplaceTextIcons(description);
+            description = HighlightNumbers(description);
             return description;
         }
 
@@ -87,6 +114,12 @@ namespace Cards.View
             description = description.Replace("{Text-Icons/energy.png}", " <sprite name=\"energy\">");
 
             return description;
+        }
+        
+        private string HighlightNumbers(string text)
+        {
+            // Substitui números inteiros (não parte de palavras) por versão colorida
+            return Regex.Replace(text, @"\b(\d+)\b", "<color=#FFA500>$1</color>");
         }
     }
 }
