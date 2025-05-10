@@ -26,12 +26,17 @@ public class PlanetSpawner : MonoBehaviour
     [Header("Padding (recuo a partir da borda visível)")]
     [SerializeField] private Vector2 padding = new Vector2(1f, 1f);
 
+
+
     [Header("Dependências")]
     [SerializeField] private ShipMover ship;
     [SerializeField] private LineRenderer line;
     [SerializeField] private TextMeshPro costLabel;
     [SerializeField] private FuelSystem fuelSystem;
     [SerializeField] private TextMeshPro fuelCostLabel;
+    [SerializeField] private int minDifficulty = 1;
+    [SerializeField] private int maxDifficulty = 5;
+    [SerializeField] private float mysteryChance = 0.2f;
 
     /* ---------- rectângulo calculado ---------- */
     private float minX, maxX, minY, maxY;
@@ -96,9 +101,15 @@ public class PlanetSpawner : MonoBehaviour
                 Debug.LogWarning($"PlanetSpawner: não encontrou espaço p/ planeta {i}.");
                 continue;
             }
+
+
             var planet = Instantiate(planetPrefab, pos, Quaternion.identity);
+
+            int diff = Random.Range(minDifficulty, maxDifficulty + 1);
+            bool mystery = (Random.value < mysteryChance);
+
             planet.GetComponent<Planet>()
-                  .Setup(ship, line, costLabel, fuelSystem, fuelCostLabel);
+                  .Setup(ship, line, costLabel, fuelSystem, fuelCostLabel, diff, mystery);
             /*
             var planet = Instantiate(planetPrefab, pos, Quaternion.identity);
             planet.GetComponent<Planet>().Setup(ship, line, costLabel);
