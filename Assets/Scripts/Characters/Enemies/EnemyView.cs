@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Armor;
 using Characters.Enemies;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,8 +17,6 @@ public class Attack
 
 public class EnemyView : MonoBehaviour
 {
-    [SerializeField] private EnemyDataSO _enemyData;
-    
     [SerializeField] private SpriteRenderer _artwork;
     [SerializeField] private Slider _healthBar;
     [SerializeField] private TextMeshProUGUI _healthText;
@@ -32,21 +31,25 @@ public class EnemyView : MonoBehaviour
     public int Health { get; private set; }
     public int Armor { get; private set; }
     
-    public EnemyDataSO EnemyData => _enemyData;
+    public bool IsDead => Health <= 0;
+    
+    public EnemyDataSO EnemyData;
     
     public event Action OnEnemyDeath; 
     
-    private void Start()
+    public void Setup(EnemyDataSO enemyDataSo)
     {
-        _artwork.sprite = _enemyData.Artwork;
-        _healthBar.maxValue = _enemyData.Health;
-        _healthBar.value = _enemyData.Health;
-        _healthText.text = $"{_enemyData.Health.ToString()}/{_enemyData.Health.ToString()}";
-        Health = _enemyData.Health;
+        EnemyData = enemyDataSo;
+        
+        _artwork.sprite = EnemyData.Artwork;
+        _healthBar.maxValue = EnemyData.Health;
+        _healthBar.value = EnemyData.Health;
+        _healthText.text = $"{EnemyData.Health.ToString()}/{EnemyData.Health.ToString()}";
+        Health = EnemyData.Health;
         Armor = 0;
         _armorView.UpdateArmorText(Armor);
         
-        _animator.runtimeAnimatorController = _enemyData.EnemyAnimator;
+        _animator.runtimeAnimatorController = EnemyData.EnemyAnimator;
 
         GenerateNextAttack();
     }
@@ -88,20 +91,20 @@ public class EnemyView : MonoBehaviour
     private IEnumerator UpdateHealthBarSmoothly(int targetHealth)
     {
         float startValue = _healthBar.value;
-        float endValue = Mathf.Clamp(targetHealth, 0, _enemyData.Health);
+        float endValue = Mathf.Clamp(targetHealth, 0, EnemyData.Health);
         float elapsedTime = 0f;
 
         while (elapsedTime < _healthBarTransitionDuration)
         {
             _healthBar.value = Mathf.Lerp(startValue, endValue, elapsedTime / _healthBarTransitionDuration);
-            _healthText.text = $"{(int)_healthBar.value}/{_enemyData.Health}";
+            _healthText.text = $"{(int)_healthBar.value}/{EnemyData.Health}";
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
         // Garantir que o valor final seja exatamente o alvo
         _healthBar.value = endValue;
-        _healthText.text = $"{(int)_healthBar.value}/{_enemyData.Health}";
+        _healthText.text = $"{(int)_healthBar.value}/{EnemyData.Health}";
     }
     
     
@@ -163,10 +166,10 @@ public class EnemyView : MonoBehaviour
         Debug.Log("Enemy defeated!");
         OnEnemyDeath?.Invoke();
         
-        Destroy(GetComponent<Collider>());
-
-        var rb = gameObject.AddComponent<Rigidbody>();
-
-        Destroy(gameObject, 5f);
+        // PopOut with DOTween
+        transform.DOScale(Vector3.zero, 0.5f).OnComplete(() =>
+        {
+            //Destroy(gameObject);
+        });
     }
 }

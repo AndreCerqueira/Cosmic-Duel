@@ -302,6 +302,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9c7c88dac992724ca4b6432d48f18b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _allEnemies:
+  - {fileID: 11400000, guid: 477f26d3946711c4ba0d5c76025258d9, type: 2}
+  _enemySpawnPoints:
+  - {fileID: 462043111}
+  - {fileID: 1041112360}
+  - {fileID: 2047165141}
   _playerPrefabContainer: {fileID: 343262687}
   _playerPrefab: {fileID: 8149609518062604408, guid: 0e4babeee050c9646a7985e0b7a56c03, type: 3}
   _enemyBotPrefab: {fileID: 3209745898417026572, guid: 566196f39c7aa114b872790c00503b3d, type: 3}
@@ -4317,7 +4323,7 @@ GameObject:
   - component: {fileID: 462043111}
   - component: {fileID: 462043110}
   m_Layer: 0
-  m_Name: Circle
+  m_Name: Enemy Spawnpoint 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6540,7 +6546,7 @@ GameObject:
   - component: {fileID: 1041112360}
   - component: {fileID: 1041112361}
   m_Layer: 0
-  m_Name: Circle (2)
+  m_Name: Enemy Spawnpoint 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10063,8 +10069,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 462043111}
-  - {fileID: 2047165141}
   - {fileID: 1041112360}
+  - {fileID: 2047165141}
   - {fileID: 1116301305}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10079,7 +10085,7 @@ GameObject:
   - component: {fileID: 2047165141}
   - component: {fileID: 2047165142}
   m_Layer: 0
-  m_Name: Circle (1)
+  m_Name: Enemy Spawnpoint 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

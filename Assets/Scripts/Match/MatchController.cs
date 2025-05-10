@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Armor;
+using Characters.Enemies;
 using DG.Tweening;
 using MoreMountains.Feedbacks;
 using Project.Runtime.Scripts.Game.Cards.View;
@@ -15,6 +18,10 @@ namespace Match
     public class MatchController : Singleton<MatchController>
     {
         private Project.Runtime.Scripts.Game.Matches.Match _match;
+        
+        [Title("Enemies")]
+        [SerializeField] private List<EnemyDataSO> _allEnemies;
+        [SerializeField] private List<Transform> _enemySpawnPoints;
         
         [Title("Prefabs")]
         [SerializeField] private Transform _playerPrefabContainer;
@@ -39,7 +46,6 @@ namespace Match
         private void Start()
         {
             var player = Instantiate(_playerPrefab, _playerPrefabContainer).GetComponent<MatchPlayerController>();
-            var enemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
             
             player.Setup(_playerHealthBar, _playerHealthText, _playerArmorView);
             
@@ -52,19 +58,14 @@ namespace Match
                 RemoveHandView();
                 Debug.Log("Game Over");
             };
-            enemy.OnEnemyDeath += () =>
-            {
-                _VictoryPopup.gameObject.SetActive(true);
-                RemoveHandView();
-                Debug.Log("You Win");
-            };
             
-            _match = new Project.Runtime.Scripts.Game.Matches.Match(player.MatchPlayer, enemy);
+            var enemies = SpawnEnemies();
+            _match = new Project.Runtime.Scripts.Game.Matches.Match(player.MatchPlayer, enemies.FirstOrDefault());
 
-            StartMatch();
+            StartMatch(enemies);
         }
 
-        private void StartMatch()
+        private void StartMatch(List<EnemyView> enemies)
         {
             _handView.Setup(_match.SelfPlayer.Hand);
             
@@ -78,8 +79,8 @@ namespace Match
             
                 PopInTurnButton(targetScale);
             });
-            
-            MoveEnemyToStartPosition(Enemy.transform);
+
+            MoveEnemiesToStartPosition(enemies);
         }
         
         
@@ -88,7 +89,35 @@ namespace Match
         
         
         
-        
+        private List<EnemyView> SpawnEnemies()
+        {
+            int enemyCount = UnityEngine.Random.Range(1, 4); // 1 to 3
+            var selectedEnemies = new List<EnemyView>();
+
+            for (int i = 0; i < enemyCount; i++)
+            {
+                var enemyData = _allEnemies[UnityEngine.Random.Range(0, _allEnemies.Count)];
+                var spawnPoint = _enemySpawnPoints[i];
+
+                var enemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
+                //enemy.transform.position = spawnPoint.position;
+                enemy.Setup(enemyData);
+
+                enemy.OnEnemyDeath += () =>
+                {
+                    if (selectedEnemies.All(e => e.IsDead))
+                    {
+                        _VictoryPopup.gameObject.SetActive(true);
+                        RemoveHandView();
+                        Debug.Log("You Win");
+                    }
+                };
+
+                selectedEnemies.Add(enemy);
+            }
+
+            return selectedEnemies;
+        }
         
         
         
@@ -99,10 +128,16 @@ namespace Match
         {
             playerTransform.DOMoveX(playerTransform.position.x + 10f, 2f).SetEase(Ease.OutQuad).OnComplete(() => onComplete?.Invoke());
         }
-
-        private void MoveEnemyToStartPosition(Transform enemyTransform)
+        
+        private void MoveEnemiesToStartPosition(List<EnemyView> enemies)
         {
-            enemyTransform.DOMoveX(enemyTransform.position.x - 10f, 2f).SetEase(Ease.OutQuad);
+            for (int i = 0; i < enemies.Count; i++)
+            {
+                var enemy = enemies[i];
+                var targetPosition = _enemySpawnPoints[i].position;
+
+                enemy.transform.DOMove(targetPosition, 2f).SetEase(Ease.OutQuad);
+            }
         }
         
         private void PopInTurnButton(Vector3 targetScale)

@@ -88,5 +88,12 @@ namespace Match
             OnEnergyChanged?.Invoke(Energy);
             Debug.Log($"{Name} spent {amount} energy. Remaining energy: {Energy}");
         }
+        
+        public void ResetEnergy(int amount)
+        {
+            Energy = amount;
+            OnEnergyChanged?.Invoke(Energy);
+            Debug.Log($"{Name} reset energy. Total energy: {Energy}");
+        }
     }
 }

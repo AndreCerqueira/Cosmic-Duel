@@ -68,7 +68,7 @@ namespace Turn
             Debug.Log("Enemy's turn has ended.");
             _changeToPlayerTurnFeedback?.PlayFeedbacks();
             
-            SelfMatchPlayer.MatchPlayer.GainEnergy(3);
+            SelfMatchPlayer.MatchPlayer.ResetEnergy(3);
             
             // draw cards until having 5
             while (SelfMatchPlayer.MatchPlayer.Hand.Count < 5)
