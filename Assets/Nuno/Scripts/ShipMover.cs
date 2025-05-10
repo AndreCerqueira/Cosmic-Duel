@@ -3,22 +3,66 @@ using UnityEngine;
 
 public class ShipMover : MonoBehaviour
 {
-    [SerializeField] private float speed = 3f;          // unidades/s
+    [Header("Velocidade (unidades / segundo)")]
+    [SerializeField] private float minSpeed = 3f;      // destino colado à nave
+    [SerializeField] private float maxSpeed = 10f;     // destino no limite do mapa
+
+    [Header("Factor de escala")]
+    [Tooltip("Distância que resulta em maxSpeed. Se 0 usa a diagonal da câmara.")]
+    [SerializeField] private float referenceDistance = 15f;
+
     private Coroutine currentMove;
 
+    /* ---------- API ---------- */
     public void MoveTo(Vector3 destination)
     {
         if (currentMove != null) StopCoroutine(currentMove);
         currentMove = StartCoroutine(MoveRoutine(destination));
     }
 
+    /* ---------- corrotina ---------- */
     private IEnumerator MoveRoutine(Vector3 target)
     {
-        while (Vector3.Distance(transform.position, target) > 0.01f)
+        while (true)
         {
-            transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
+            float dist = Vector3.Distance(transform.position, target);
+            if (dist < 0.01f) break;
+
+            float curSpeed = CalculateSpeed(dist);
+            transform.position = Vector3.MoveTowards(
+                                     transform.position,
+                                     target,
+                                     curSpeed * Time.deltaTime);
+
             yield return null;
         }
         transform.position = target;
+    }
+
+    /* ---------- lógica de velocidade ---------- */
+    private float CalculateSpeed(float distance)
+    {
+        // Se referenceDistance = 0, calcula automáticamente diagonal da câmara
+        float refDist = (referenceDistance > 0)
+                        ? referenceDistance
+                        : GetCameraDiagonal();
+
+        // Normaliza 0-1 e clamp
+        float t = Mathf.Clamp01(distance / refDist);
+
+        // LINEAR:  speed = min + t*(max-min)
+        return Mathf.Lerp(minSpeed, maxSpeed, t);
+
+        // Quer curva exponencial? troca por:
+        // return Mathf.Lerp(minSpeed, maxSpeed, t * t);      // acelera mais devagar no início
+    }
+
+    private float GetCameraDiagonal()
+    {
+        if (Camera.main == null || !Camera.main.orthographic) return 20f;
+
+        float h = Camera.main.orthographicSize * 2f;
+        float w = h * Camera.main.aspect;
+        return Mathf.Sqrt(w * w + h * h);   // diagonal visível
     }
 }

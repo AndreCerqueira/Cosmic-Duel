@@ -1,68 +1,155 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 
 [RequireComponent(typeof(Collider2D))]
 public class Planet : MonoBehaviour
 {
     /* ---------- Inspector ---------- */
-    [Header("Refer�ncias")]
-    [SerializeField] private ShipMover ship;       // arrasta a Nave
-    [SerializeField] private LineRenderer line;      // arrasta o LineRenderer
-    [SerializeField] private TextMeshPro costLabel;  // arrasta o TextMeshPro (3D)
+    [Header("Referências externas")]
+    [SerializeField] private ShipMover ship;
+    [SerializeField] private LineRenderer line;
+    [SerializeField] private TextMeshPro costLabel;
+    [SerializeField] private FuelSystem fuel;
+    [SerializeField] private TextMeshPro fuelCostLabel;
+
+    [Header("Shader property")]
+    [SerializeField] private string auraColorProperty = "_OutlineColor";
+
+    [Header("Cores")]
+    [SerializeField] private Color hoverColor = Color.white;
+    [SerializeField] private Color selectedColor = Color.green;
+    [SerializeField] private Color idleColor = new Color(1, 1, 1, 0);
 
     [Header("Economia")]
-    [SerializeField] private float costPerUnit = 10f;   // cr�ditos por unidade
-    [SerializeField] private float dashLength = 0.25f; // tamanho de cada tra�o
+    [SerializeField] private float costPerUnit = 10f;
+    [SerializeField] private float dashLength = 0.25f;
 
-    /* ---------- estado interno ---------- */
-    private bool hovering;   // true enquanto o rato est� sobre o planeta
+    [Header("UI do custo de combustível")]
+    //[SerializeField] private Vector3 fuelLabelOffset = new Vector3(3f, 0f, 0f);   // ↑ deslocamento
+    [SerializeField] private Color fuelLabelColor = Color.red;                 // cor do texto
 
-    /* ---------- eventos de rato ---------- */
+
+
+    /* ---------- estado ---------- */
+    private bool hovering;
+    private bool isInitialized;
+    private bool selected;
+
+    private Material auraMat;
+
+    private static Planet currentTarget;          // <- planeta destino global
+    private static readonly int AURA_ID = Shader.PropertyToID("_OutlineColor");
+
+    /* ---------- SETUP ---------- */
+    private void Awake()
+    {
+        auraMat = GetComponent<SpriteRenderer>().material;   // cópia p/ instância
+        SetAura(idleColor);
+    }
+
+    /* ---------- EVENTOS DE RATO ---------- */
     private void OnMouseEnter()
     {
+
+
         hovering = true;
+        if (!selected) SetAura(hoverColor);
+
         line.enabled = true;
         costLabel.gameObject.SetActive(true);
+        fuelCostLabel.gameObject.SetActive(true);
+
     }
 
     private void OnMouseExit()
     {
+
+        // onde já ligas costLabel & line
+
         hovering = false;
+        if (!selected) SetAura(idleColor);
+
         line.enabled = false;
         costLabel.gameObject.SetActive(false);
+        fuelCostLabel.gameObject.SetActive(false);
+
     }
 
-    private void OnMouseDown() => ship.MoveTo(transform.position);
+    private void OnMouseDown()
+    {
+        float distance = Vector3.Distance(transform.position, ship.transform.position);
 
-    /* ---------- actualiza��o por frame ---------- */
+        // pergunta ao FuelSystem se há combustível
+        if (!fuel.TryConsumeForDistance(distance)) return;   // sem fuel ⇒ não viaja
+
+        /* 1) dizer ao destino antigo para desmarcar-se */
+        if (currentTarget != null && currentTarget != this)
+            currentTarget.Deselect();
+
+        /* 2) este passa a ser o novo destino */
+        currentTarget = this;
+        selected = true;
+        SetAura(selectedColor);
+
+        ship.MoveTo(transform.position);
+    }
+
+    /* ---------- LOOP ---------- */
     private void Update()
     {
-        if (!hovering) return;                 // s� calcula enquanto o rato est� em cima
+        if (!hovering) return;
+        if (!isInitialized) return;
 
         Vector3 shipPos = ship.transform.position;
         Vector3 planetPos = transform.position;
 
-        float distance = Vector3.Distance(shipPos, planetPos);
-        float cost = distance * costPerUnit;
+        float dist = Vector3.Distance(shipPos, planetPos);
+        float cost = dist * costPerUnit;
 
-        // 1) linha tracejada
-        UpdateLine(shipPos, planetPos, distance);
+        // ----- combustível que vai gastar -----
+        float fuelNeeded = dist * fuel.FuelPerUnit;          // torna FuelPerUnit público (getter) ou expõe
+        float percentSpend = fuelNeeded / fuel.MaxFuel * 100f; // % do reservatório total
 
-        // 2) texto no meio
-        costLabel.text = $"{cost:0} C";
-        costLabel.transform.position = planetPos;
-        costLabel.transform.position += Vector3.up * 2f; // levanta o texto
+        fuelCostLabel.text = $"-{percentSpend:0}%";
+        fuelCostLabel.transform.position = shipPos + Vector3.up * 10f; // 2 unidades acima da nave
+        //fuelCostLabel.transform.position = shipPos + fuelLabelOffset;
+
+
+        UpdateLine(shipPos, planetPos, dist);
+
+        costLabel.text = $"{cost:0} ×10¹² km";
+        costLabel.transform.position = planetPos + Vector3.up * 4f;
     }
 
-    /* ---------- utilit�rio ---------- */
-    private void UpdateLine(Vector3 shipPos, Vector3 planetPos, float distance)
+    /* ---------- HELPERS ---------- */
+    private void Deselect()
+    {
+        selected = false;
+        SetAura(hovering ? hoverColor : idleColor);
+    }
+
+    private void SetAura(Color c) => auraMat.SetColor(AURA_ID, c);
+
+    private void UpdateLine(Vector3 a, Vector3 b, float dist)
     {
         line.positionCount = 2;
-        line.SetPosition(0, shipPos);
-        line.SetPosition(1, planetPos);
+        line.SetPosition(0, a);
+        line.SetPosition(1, b);
 
-        // repetir a textura ao longo do comprimento
         line.textureMode = LineTextureMode.Tile;
-        line.material.mainTextureScale = new Vector2(distance / dashLength, 1f);
+        line.material.mainTextureScale = new Vector2(dist / dashLength, 1f);
+    }
+
+    /* ---------- API usado pelo Spawner ---------- */
+    public void Setup(ShipMover s, LineRenderer l, TextMeshPro label, FuelSystem f, TextMeshPro fuelCostLabel)
+    {
+        ship = s;
+        line = l;
+        costLabel = label;
+        fuel = f;
+        this.fuelCostLabel = fuelCostLabel;
+        this.fuelCostLabel.color = fuelLabelColor;
+
+        isInitialized = true;
     }
 }
