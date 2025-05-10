@@ -5,6 +5,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+public class Attack
+{
+    public int Damage;
+    public int Armor;
+}
+
+
 public class EnemyView : MonoBehaviour
 {
     [SerializeField] private EnemyDataSO _enemyData;
@@ -14,6 +21,8 @@ public class EnemyView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _healthText;
     [SerializeField] private TextMeshProUGUI _attack;
     [SerializeField] private ArmorView _armorView;
+    
+    public Attack NextAttack { get; private set; }
     
     private float _healthBarTransitionDuration = 0.25f;
     
@@ -28,10 +37,11 @@ public class EnemyView : MonoBehaviour
         _healthBar.maxValue = _enemyData.Health;
         _healthBar.value = _enemyData.Health;
         _healthText.text = $"{_enemyData.Health.ToString()}/{_enemyData.Health.ToString()}";
-        _attack.text = $"Next turn: {_enemyData.BaseAttack.ToString()}";
         Health = _enemyData.Health;
         Armor = 0;
         _armorView.UpdateArmorText(Armor);
+
+        GenerateNextAttack();
     }
     
 
@@ -61,6 +71,13 @@ public class EnemyView : MonoBehaviour
     }
     
     
+    public void LoseAllArmor()
+    {
+        Armor = 0;
+        _armorView.UpdateArmorText(Armor);
+    }
+    
+    
     private IEnumerator UpdateHealthBarSmoothly(int targetHealth)
     {
         float startValue = _healthBar.value;
@@ -78,5 +95,59 @@ public class EnemyView : MonoBehaviour
         // Garantir que o valor final seja exatamente o alvo
         _healthBar.value = endValue;
         _healthText.text = $"{(int)_healthBar.value}/{_enemyData.Health}";
+    }
+    
+    
+    public void GenerateNextAttack()
+    {
+        float chance = Random.value;
+        bool isImpredictable = chance < 0.3f;
+        
+        NextAttack = GenerateAttack();
+
+        if (isImpredictable) {
+            _attack.text = "Next turn: ?";
+            return;
+        }
+        
+        _attack.text = "Next turn: ";
+    
+        if (NextAttack.Damage > 0)
+        {
+            _attack.text += $"{NextAttack.Damage} <sprite name=sword>";
+        }
+    
+        if (NextAttack.Armor > 0)
+        {
+            _attack.text += $"{NextAttack.Armor} <sprite name=shield>";
+        }
+    }
+    
+    
+    private Attack GenerateAttack()
+    {
+        // choose one randomly 75% to damage, 25% to armor
+        int randomValue = Random.Range(0, 100);
+        
+        int damage = 0;
+        int armor = 0;
+        
+        if (randomValue < 80)
+        {
+            damage = Random.Range(1, 10);
+        }
+        else
+        {
+            armor = Random.Range(1, 10);
+        }
+        
+        // Create a new Attack object with the generated values
+        Attack attack = new Attack
+        {
+            Damage = damage,
+            Armor = armor
+        };
+
+        return attack;
     }
 }

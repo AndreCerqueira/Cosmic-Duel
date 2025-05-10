@@ -138,6 +138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bdc601c7f04ff447874ae988f8f1ebf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _startingHealth: 10
   _deckData: {fileID: 11400000, guid: ace7f6db3f4fa7747aea5296fad4b554, type: 2}
   _playerName: Player
 --- !u!1 &5037486304238966466

@@ -28,15 +28,31 @@ namespace Turn
         
         private IEnumerator EnemyTurnPerformer(EnemyTurnGA action)
         {
+            // Remove enemy armor
+            MatchController.Instance.Enemy.LoseAllArmor();
+            
+            
             // Perform enemy turn logic here
             Debug.Log("Enemy's turn is being performed.");
             _changeToEnemyTurnFeedback?.PlayFeedbacks();
             
+            // get the enemy attack
+            var attack = MatchController.Instance.Enemy.NextAttack;
             
-            // Deal 10 damage to the player
-            SelfMatchPlayer.DealDamage(10);
+            // Check if the enemy has an attack
+            if (attack.Damage > 0)
+            {
+                // Deal damage to the player
+                SelfMatchPlayer.DealDamage(attack.Damage);
+            }
             
+            if (attack.Armor > 0)
+            {
+                // Gain armor for the enemy
+                MatchController.Instance.Enemy.GainArmor(attack.Armor);
+            }
             
+            MatchController.Instance.Enemy.GenerateNextAttack();
             
             // Simulate some delay for the enemy's turn
             yield return new WaitForSeconds(2f);
