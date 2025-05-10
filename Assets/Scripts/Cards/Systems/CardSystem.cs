@@ -1,7 +1,10 @@
+using System.Collections;
+using Cards.Systems.GA;
 using Match;
 using Project.Runtime.Scripts.Game.Cards.View;
 using Project.Runtime.Scripts.Game.Matches;
 using Project.Runtime.Scripts.General;
+using Project.Runtime.Scripts.General.ActionSystem;
 using UnityEngine;
 
 namespace Cards.Systems
@@ -15,49 +18,50 @@ namespace Cards.Systems
 
         public bool IsAnyCardBeingDragged;
         
-        /*
+        public GameObject SelectedObjectWithCard;
+        
         private void OnEnable()
         {
             ActionSystem.AttachPerformer<PlayCardGA>(PlayCardPerformer);
             ActionSystem.AttachPerformer<DrawCardGA>(DrawCardPerformer);
-
-            ActionSystem.SubscribeReaction<SummonCharacterGA>(SummonCharacterReaction, ReactionTiming.POST);
         }
 
         private void OnDisable()
         {
             ActionSystem.DetachPerformer<PlayCardGA>();
             ActionSystem.DetachPerformer<DrawCardGA>();
-
-            ActionSystem.UnsubscribeReaction<SummonCharacterGA>(SummonCharacterReaction, ReactionTiming.POST);
         }
 
         private IEnumerator DrawCardPerformer(DrawCardGA drawCardGA)
         {
-            var card = drawCardGA.Player.DrawCard();
-            if (card == null) yield break;
+            for (int i = 0; i < drawCardGA.Amount; i++)
+            {
+                var card = MatchController.Instance.SelfPlayer.DrawCard();
+                if (card == null) continue;
 
-            Debug.Log($"[AC] Drawing card: {card.Name}");
+                Debug.Log($"[AC] Drawing card: {card.Name}");
+            }
 
             yield return null;
         }
 
         private IEnumerator PlayCardPerformer(PlayCardGA playCardGA)
         {
-            Debug.Log($"[AC] Playing card: {playCardGA.CardView.name} at: {playCardGA.AreaView.name}");
-
-            SummonCharacterGA summonCharacterGA = new(playCardGA.CardView, playCardGA.AreaView, playCardGA.Player);
-            ActionSystem.Instance.AddReaction(summonCharacterGA);
+            Debug.Log($"[AC] Playing card: {playCardGA.CardView.name} at: {playCardGA.Target.name}");
+            
+            SelectedObjectWithCard = playCardGA.Target;
+            
+            // Get effects from the card and apply them
+            var cardEffects = playCardGA.CardView.Card.Effects;
+            
+            foreach (var effect in cardEffects)
+            {
+                PerformEffectGA performEffectGA = new(effect);
+                ActionSystem.Instance.AddReaction(performEffectGA);
+            }
 
             yield return null;
         }
 
-        private void SummonCharacterReaction(SummonCharacterGA summonCharacterGA)
-        {
-            summonCharacterGA.Player.Hand.RemoveCard(summonCharacterGA.CardView.Card);
-
-            DrawCardGA drawCardGA = new(summonCharacterGA.Player);
-            ActionSystem.Instance.AddReaction(drawCardGA);
-        }*/
     }
 }

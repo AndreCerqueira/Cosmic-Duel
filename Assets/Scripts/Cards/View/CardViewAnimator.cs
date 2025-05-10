@@ -69,9 +69,10 @@ namespace Cards.View
 
             _transform.SetParent(newParent);
     
-            var newLocalRotation = Quaternion.Euler(90f, 0f, 0f);
-            var newLocalPosition = new Vector3(0f, 1f, 0f);
-            var finalLocalPosition = new Vector3(0f, 0.6f, 0f);
+            /**/
+            var newLocalRotation = Quaternion.Euler(0f, 0f, 0f);
+            var newLocalPosition = new Vector3(0f, 0f, 0f);
+            var finalLocalPosition = new Vector3(0f, 0f, 0f);
     
             _wrapper.DOScale(Vector3.one, _duration).SetEase(_scaleEase);
             _wrapper.DOLocalRotateQuaternion(Quaternion.identity, _duration).SetEase(_moveEase);

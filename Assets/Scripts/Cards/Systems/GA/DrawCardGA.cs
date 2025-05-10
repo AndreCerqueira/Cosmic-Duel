@@ -4,8 +4,11 @@ namespace Cards.Systems.GA
 {
     public class DrawCardGA : GameAction
     {
-        public DrawCardGA()
+        public int Amount { get; private set; }
+        
+        public DrawCardGA(int amount)
         {
+            Amount = amount;
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -18,5 +19,8 @@ namespace Cards.Data
         [MinValue(0)]
         [MaxValue(3)]
         public int Cost;
+        
+        [Title("Effects")]
+        public List<EffectPlain> Effects;
     }
 }

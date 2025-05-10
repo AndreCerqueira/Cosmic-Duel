@@ -955,7 +955,7 @@ SortingGroup:
   m_Enabled: 1
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 100
   m_SortAtRoot: 0
 --- !u!65 &3871603097280480107
 BoxCollider:

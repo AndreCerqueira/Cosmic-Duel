@@ -8,7 +8,8 @@ namespace Match
 {
     public class MatchPlayer
     {
-        private const int HAND_SIZE = 5;
+        private const int HAND_START_SIZE = 5;
+        private const int HAND_MAX_SIZE = 10;
         
         private readonly DeckDataSO _deckData;
         
@@ -17,19 +18,27 @@ namespace Match
         public Deck Deck { get; set; }
         public Hand Hand { get; set; }
         
+        public int Health { get; set; }
+        public int MaxHealth;
         
-        public MatchPlayer(DeckDataSO deckData, string name)
+        public int Armor { get; set; }
+        
+        
+        public MatchPlayer(DeckDataSO deckData, string name, int health)
         {
+            Health = health;
+            MaxHealth = health;
+            Armor = 0;
             _deckData = deckData;
             Name = name;
             Deck = new Deck(_deckData);
-            Hand = new Hand(HAND_SIZE);
+            Hand = new Hand(HAND_MAX_SIZE);
         }
         
         
         public void DrawStartingHand()
         {
-            for (var i = 0; i < HAND_SIZE; i++)
+            for (var i = 0; i < HAND_START_SIZE; i++)
             {
                 DrawCard();
             }
@@ -55,6 +64,15 @@ namespace Match
             Deck.Shuffle();
             Hand.Clear();
             DrawStartingHand();
+        }
+        
+        
+        public void DealDamage(int amount)
+        {
+            Health -= amount;
+            if (Health < 0) Health = 0;
+            
+            Debug.Log($"{Name} took {amount} damage. Remaining health: {Health}");
         }
     }
 }

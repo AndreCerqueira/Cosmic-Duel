@@ -1,9 +1,13 @@
+using System;
 using System.Text.RegularExpressions;
+using Armor;
 using Match;
 using Project.Runtime.Scripts.Game.Cards.View;
 using Project.Runtime.Scripts.General;
 using Sirenix.OdinInspector;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Project.Runtime.Scripts.Game.Matches
 {
@@ -14,52 +18,37 @@ namespace Project.Runtime.Scripts.Game.Matches
         [Title("Prefabs")]
         [SerializeField] private Transform _playerPrefabContainer;
         [SerializeField] private MatchPlayerController _playerPrefab;
-        //[SerializeField] private MatchEnemyController _enemyBotPrefab;
+        [SerializeField] private EnemyView _enemyBotPrefab;
         
         [Title("Views")]
         [SerializeField] private HandView _handView;
+        [SerializeField] private Slider _playerHealthBar;
+        [SerializeField] private TextMeshProUGUI _playerHealthText;
+        [SerializeField] private ArmorView _playerArmorView;
 
         public MatchPlayer SelfPlayer => _match.SelfPlayer;
+        [NonSerialized] public MatchPlayerController SelfPlayerController;
+        public EnemyView Enemy => _match.Enemy;
         
         private void Start()
         {
-            var player = Instantiate(_playerPrefab, _playerPrefabContainer).MatchPlayer;
-            //var enemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).MatchEnemy;
-            _match = new Match(player);//, enemy);
-            //_boardView.Setup(_match.Players);
+            var player = Instantiate(_playerPrefab, _playerPrefabContainer).GetComponent<MatchPlayerController>();
+            var enemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
+            
+            player.Setup(_playerHealthBar, _playerHealthText, _playerArmorView);
+            
+            SelfPlayerController = player;
+            
+            _match = new Match(player.MatchPlayer, enemy);
 
-            //StartMatch();
-            StartMulligan();
+            StartMatch();
         }
 
         private void StartMatch()
         {
-            /*
-#if UNITY_EDITOR
-            if (_skipIntro)
-            {
-                _startMatchSkipIntroFeedback?.PlayFeedbacks();
-                return;
-            }
-#endif
-            _startMatchFeedback?.PlayFeedbacks();
-            */
-        }
-        
-        public void StartMulligan()
-        {
             _handView.Setup(_match.SelfPlayer.Hand);
             
-            //foreach (var player in _match.Players)
             SelfPlayer.DrawStartingHand();
-            
-            //_mulliganView.Setup(_match.SelfPlayer);
-            _handView.Setup(_match.SelfPlayer.Hand);
-        }
-        
-        
-        public void StartGame()
-        {
         }
     }
 }

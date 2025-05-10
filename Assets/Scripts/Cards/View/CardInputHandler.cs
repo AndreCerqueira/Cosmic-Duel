@@ -15,7 +15,7 @@ namespace Cards.View
     [RequireComponent(typeof(Collider))]
     public class CardInputHandler : MonoBehaviour
     {
-        private const string DROP_TARGET_TAG = "Area";
+        private const string DROP_TARGET_TAG = "Character";
         private static MatchPlayer SelfMatchPlayer => MatchController.Instance.SelfPlayer;
         
         [Header("Hover Settings")]
@@ -152,7 +152,7 @@ namespace Cards.View
                 enabled = false;
                 _collider.enabled = false;
                 
-                var areaTransform = hit.collider.transform.parent;
+                var areaTransform = hit.collider.transform;
                 
                 _animator.AnimateDrop(areaTransform, () => 
                 {
@@ -160,11 +160,11 @@ namespace Cards.View
                     
                     if (ActionSystem.Instance.IsPerforming) return;
                     
-                    // var areaView = areaTransform.GetComponent<AreaView>();
-                    // var cardView = GetComponent<CardView>();
+                    //var enemyView = areaTransform.GetComponent<EnemyView>();
+                    var cardView = GetComponent<CardView>();
                     
-                    // PlayCardGA playCardGA = new(cardView, areaView, SelfMatchPlayer);
-                    // ActionSystem.Instance.Perform(playCardGA);
+                    PlayCardGA playCardGA = new(cardView, areaTransform.gameObject);
+                    ActionSystem.Instance.Perform(playCardGA);
                     
                 });
             }
@@ -187,13 +187,13 @@ namespace Cards.View
             if (!Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo))
                 return false;
 
-            return false;
-            /*
             if (hitInfo.collider == null || !hitInfo.collider.CompareTag(DROP_TARGET_TAG)) return false;
 
-            var areaView = hitInfo.collider.GetComponentInParent<AreaView>();
+            // check if hitInfo have EnemyView component
+            // var enemyView = hitInfo.collider.GetComponent<EnemyView>();
+            // if (enemyView == null) return false;
 
-            return areaView.HasSpaceForCharacter() && areaView.IsValidSpawningArea();*/
+            return true;
         }
 
         private void ReturnToOriginalPosition()

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Cards.Data;
 using UnityEngine;
 
@@ -10,6 +11,8 @@ namespace Cards.Models
         public string Name => _data.Name;
         public string Description => _data.Description;
         public Sprite Artwork => _data.Artwork;
+        
+        public List<EffectPlain> Effects => _data.Effects;
         
         public int Cost { get; private set; }
         

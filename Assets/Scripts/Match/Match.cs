@@ -7,13 +7,13 @@ namespace Project.Runtime.Scripts.Game.Matches
         // public readonly IMatchPlayer[] Players;
         
         public MatchPlayer SelfPlayer;
-        // public MatchEnemy Enemy;
+        public EnemyView Enemy;
         
-        public Match(MatchPlayer player)// , MatchEnemy enemy)
+        public Match(MatchPlayer player, EnemyView enemy)// , MatchEnemy enemy)
         {
             // Players = new IMatchPlayer[] { player, enemy };
             SelfPlayer = player;
-            // Enemy = enemy;
+            Enemy = enemy;
         }
     }
 }

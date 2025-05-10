@@ -8,7 +8,7 @@ namespace Project.Runtime.Scripts.Game.Cards.Models
 {
     public class Hand
     {
-        private const int MAX_HAND_SIZE = 5;
+        private readonly int _maxHandSize;
         
         public List<Card> Cards { get; private set; }
         public int Count => Cards.Count;
@@ -18,19 +18,21 @@ namespace Project.Runtime.Scripts.Game.Cards.Models
         public event Action<Card> CardRemovedEvent;
         
         
-        public Hand(int size)
+        public Hand(int maxHandSize)
         {
-            Cards = new List<Card>(size);
+            _maxHandSize = maxHandSize;
+            Cards = new List<Card>(maxHandSize);
         }
         
         
         private void OnCardAdded(Card card) => CardAddedEvent?.Invoke(card);
         private void OnCardRemoved(Card card) => CardRemovedEvent?.Invoke(card);
         
+        public bool CanAddCard() => Cards.Count < _maxHandSize;
         
         public void AddCard(Card card)
         {
-            if (Cards.Count >= MAX_HAND_SIZE)
+            if (!CanAddCard())
             {
                 Debug.LogWarning("Hand is full");
                 return;
