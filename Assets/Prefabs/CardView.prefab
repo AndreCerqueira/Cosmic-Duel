@@ -945,6 +945,7 @@ MonoBehaviour:
   _energyCost: {fileID: 2821749842496345373}
   _artwork: {fileID: 5870352381724203433}
   _wrapper: {fileID: 6340428893190422176}
+  _outline: {fileID: 939405084294143244}
 --- !u!210 &5765575339151122005
 SortingGroup:
   m_ObjectHideFlags: 0

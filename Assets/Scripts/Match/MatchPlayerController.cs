@@ -49,6 +49,7 @@ namespace Project.Runtime.Scripts.Game.Matches
 
             if (amount > 0) MatchPlayer.Health -= amount;
 
+            _armorView.UpdateArmorText(MatchPlayer.Armor);
             _healthBar.value = MatchPlayer.Health;
             _healthText.text = $"{MatchPlayer.Health}/{MatchPlayer.MaxHealth}";
 

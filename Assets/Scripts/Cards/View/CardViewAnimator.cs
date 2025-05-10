@@ -69,28 +69,29 @@ namespace Cards.View
 
             _transform.SetParent(newParent);
     
-            /**/
             var newLocalRotation = Quaternion.Euler(0f, 0f, 0f);
             var newLocalPosition = new Vector3(0f, 0f, 0f);
             var finalLocalPosition = new Vector3(0f, 0f, 0f);
-    
-            _wrapper.DOScale(Vector3.one, _duration).SetEase(_scaleEase);
-            _wrapper.DOLocalRotateQuaternion(Quaternion.identity, _duration).SetEase(_moveEase);
-            _wrapper.DOLocalMove(Vector3.zero, _duration).SetEase(_moveEase);
 
-            _transform.DOLocalRotateQuaternion(newLocalRotation, _duration).SetEase(_moveEase);
-    
+            float dropDuration = _duration * 0.5f;
+
+            _wrapper.DOScale(Vector3.one, dropDuration).SetEase(_scaleEase);
+            _wrapper.DOLocalRotateQuaternion(Quaternion.identity, dropDuration).SetEase(_moveEase);
+            _wrapper.DOLocalMove(Vector3.zero, dropDuration).SetEase(_moveEase);
+
+            _transform.DOLocalRotateQuaternion(newLocalRotation, dropDuration).SetEase(_moveEase);
+
             var moveSequence = DOTween.Sequence();
-            moveSequence.Append(_transform.DOLocalMove(newLocalPosition, _duration).SetEase(_moveEase));
-            moveSequence.AppendInterval(_duration);
-            moveSequence.Append(_transform.DOLocalMove(finalLocalPosition, _duration).SetEase(Ease.InQuad));
-            moveSequence.Join(_transform.DOScale(Vector3.zero, _duration*3).SetEase(Ease.InQuad));
-    
+            moveSequence.Append(_transform.DOLocalMove(newLocalPosition, dropDuration).SetEase(_moveEase));
+            moveSequence.AppendInterval(dropDuration);
+            moveSequence.Append(_transform.DOLocalMove(finalLocalPosition, dropDuration).SetEase(Ease.InQuad));
+            moveSequence.Join(_transform.DOScale(Vector3.zero, dropDuration * 3).SetEase(Ease.InQuad));
+
             if (onComplete != null)
             {
                 moveSequence.OnComplete(() => onComplete?.Invoke());
             }
-    
+
             return moveSequence;
         }
         

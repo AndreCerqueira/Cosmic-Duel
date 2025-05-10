@@ -73,15 +73,6 @@ namespace Match
         }
         
         
-        public void DealDamage(int amount)
-        {
-            Health -= amount;
-            if (Health < 0) Health = 0;
-            
-            Debug.Log($"{Name} took {amount} damage. Remaining health: {Health}");
-        }
-        
-        
         public void GainEnergy(int amount)
         {
             Energy += amount;

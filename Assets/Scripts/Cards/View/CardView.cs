@@ -1,6 +1,8 @@
 using System;
 using System.Text.RegularExpressions;
 using Cards.Models;
+using Match;
+using Project.Runtime.Scripts.Game.Matches;
 using TMPro;
 using UnityEngine;
 
@@ -8,6 +10,8 @@ namespace Cards.View
 {
     public class CardView : MonoBehaviour
     {
+        private static MatchPlayer SelfMatchPlayer => MatchController.Instance.SelfPlayer;
+        
         [NonSerialized] public CardInputHandler InputHandler;
         
         [SerializeField] private TMP_Text _name;
@@ -15,8 +19,26 @@ namespace Cards.View
         [SerializeField] private TMP_Text _energyCost;
         [SerializeField] private SpriteRenderer _artwork;
         [SerializeField] private GameObject _wrapper;
+        [SerializeField] private GameObject _outline;
         
         public Card Card { get; private set; }
+        
+        private void OnEnable()
+        {
+            SelfMatchPlayer.OnEnergyChanged += UpdateOutlineState;
+        }
+
+        private void OnDisable()
+        {
+            try
+            {
+                SelfMatchPlayer.OnEnergyChanged -= UpdateOutlineState;
+            }
+            catch (Exception _)
+            {
+                // ignored
+            }
+        }
 
         public void Setup(Card card)
         {
@@ -29,6 +51,21 @@ namespace Cards.View
             _artwork.sprite = card.Artwork;
             
             InputHandler = GetComponent<CardInputHandler>();
+
+            UpdateOutlineState(SelfMatchPlayer.Energy);
+        }
+        
+
+        private void UpdateOutlineState(int energy)
+        {
+            if (energy >= Card.Cost)
+            {
+                _outline.SetActive(true);
+            }
+            else
+            {
+                _outline.SetActive(false);
+            }
         }
 
         private string FormatDescription(string description)
