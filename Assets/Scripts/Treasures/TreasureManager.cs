@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
+using Match;
 using MoreMountains.Feedbacks;
+using Project.Runtime.Scripts.Game.Matches;
 using Project.Runtime.Scripts.General;
 using Treasures;
 using UnityEngine;
@@ -9,6 +11,8 @@ using UnityEngine.UI;
 
 public class TreasureManager : Singleton<TreasureManager>
 {
+    private static MatchPlayerController SelfMatchPlayer => MatchController.Instance.SelfPlayerController;
+    
     [SerializeField] private MMF_Player _closeTreasurePopupFeedback;
     
     [SerializeField] private TreasureDataSO[] _treasureDataSos;
@@ -103,6 +107,10 @@ public class TreasureManager : Singleton<TreasureManager>
         // Logic to gain health bonus
         Debug.Log("Gained Health Bonus!");
         
+        StatusManager.Instance.SetHealth(SelfMatchPlayer.MatchPlayer.Health);
+        StatusManager.Instance.RegenHealth(10);
+        SelfMatchPlayer.MatchPlayer.Health = StatusManager.Instance.CurrentHealth;
+        
         DoMatchEnd();
     }
     
@@ -118,7 +126,7 @@ public class TreasureManager : Singleton<TreasureManager>
     {
         // Logic to gain armor bonus
         Debug.Log("Gained Armor Bonus!");
-        BonusManager.Instance.AddArmorBonus();
+        StatusManager.Instance.AddArmorBonus();
         
         DoMatchEnd();
     }
@@ -127,13 +135,17 @@ public class TreasureManager : Singleton<TreasureManager>
     {
         // Logic to gain damage bonus
         Debug.Log("Gained Damage Bonus!");
-        BonusManager.Instance.AddDamageBonus();
+        StatusManager.Instance.AddDamageBonus();
 
         DoMatchEnd();
     }
     
     private void DoMatchEnd()
     {
+        // Save remaining health
+        Debug.Log("Saving remaining health");
+        StatusManager.Instance.SetHealth(SelfMatchPlayer.MatchPlayer.Health);
+        
         _closeTreasurePopupFeedback?.PlayFeedbacks();
         MatchGameOverSystem.Instance.GameOver(true);
     }

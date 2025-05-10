@@ -58,7 +58,7 @@ namespace Turn
                 if (attack.Damage > 0)
                 {
                     var targetPosition = _enemyAttackDestination.position;
-                    yield return enemy.transform.DOMove(targetPosition, 0.5f).SetEase(Ease.OutQuad).WaitForCompletion();
+                    yield return enemy.transform.DOMove(targetPosition, 0.2f).SetEase(Ease.OutQuad).WaitForCompletion();
                     
                     player.DealDamage(attack.Damage);
                     Debug.Log($"{enemy.name} dealt {attack.Damage} damage.");
@@ -82,7 +82,7 @@ namespace Turn
                 yield return new WaitForSeconds(0.3f);
 
                 // 4. Voltar à posição original
-                yield return enemy.transform.DOMove(originalPosition, 0.5f).SetEase(Ease.InSine).WaitForCompletion();
+                yield return enemy.transform.DOMove(originalPosition, 0.2f).SetEase(Ease.InSine).WaitForCompletion();
 
                 // 5. Pequena pausa entre inimigos
                 yield return new WaitForSeconds(0.5f);

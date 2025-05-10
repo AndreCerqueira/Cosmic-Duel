@@ -17,13 +17,13 @@ public class BonusDisplayView : MonoBehaviour
     
     private void UpdateBonusDisplay()
     {
-        if (BonusManager.Instance.DamageBonus > 0)
-            _damageBonusText.text = $"+{BonusManager.Instance.DamageBonus}";
+        if (StatusManager.Instance.DamageBonus > 0)
+            _damageBonusText.text = $"+{StatusManager.Instance.DamageBonus}";
         else
             _damageBonusContainer.SetActive(false);
         
-        if (BonusManager.Instance.ArmorBonus > 0)
-            _armorBonusText.text = $"+{BonusManager.Instance.ArmorBonus}";
+        if (StatusManager.Instance.ArmorBonus > 0)
+            _armorBonusText.text = $"+{StatusManager.Instance.ArmorBonus}";
         else
             _armorBonusContainer.SetActive(false);
         

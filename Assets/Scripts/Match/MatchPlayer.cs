@@ -29,10 +29,10 @@ namespace Match
         public event Action<int> OnEnergyChanged; 
         
         
-        public MatchPlayer(DeckDataSO deckData, string name, int health)
+        public MatchPlayer(DeckDataSO deckData, string name, int health, int maxHealth)
         {
             Health = health;
-            MaxHealth = health;
+            MaxHealth = maxHealth;
             Armor = 0;
             Energy = 0;
             _deckData = deckData;

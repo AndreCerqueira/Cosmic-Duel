@@ -1,3 +1,4 @@
+using System.Collections;
 using MoreMountains.Feedbacks;
 using Project.Runtime.Scripts.General;
 using UnityEngine;
@@ -15,6 +16,8 @@ public class MatchGameOverSystem : Singleton<MatchGameOverSystem>
         }
         else
         {
+            StatusManager.Instance.ResetStatus();
+            
             _loseChangeScreenFeedback?.PlayFeedbacks();
         }
     }

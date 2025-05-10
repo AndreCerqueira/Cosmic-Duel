@@ -108,6 +108,16 @@ namespace Match
                     boss.Setup(bossData);
                     boss.transform.localScale *= 2; // Dobra o tamanho do Boss
                     boss._canvasTransform.localScale /= 2; 
+                    
+                    boss.OnEnemyDeath += () =>
+                    {
+                        if (selectedEnemies.All(e => e.IsDead))
+                        {
+                            _VictoryPopup.gameObject.SetActive(true);
+                            RemoveHandView();
+                            Debug.Log("You Win");
+                        }
+                    };
 
                     selectedEnemies.Add(boss);
                 }
@@ -121,6 +131,16 @@ namespace Match
                         var commonEnemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
                         commonEnemy.Setup(commonEnemyData);
                         selectedEnemies.Add(commonEnemy);
+                        
+                        commonEnemy.OnEnemyDeath += () =>
+                        {
+                            if (selectedEnemies.All(e => e.IsDead))
+                            {
+                                _VictoryPopup.gameObject.SetActive(true);
+                                RemoveHandView();
+                                Debug.Log("You Win");
+                            }
+                        };
                     }
                 }
             }
@@ -163,6 +183,16 @@ namespace Match
                     var commonEnemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
                     commonEnemy.Setup(commonEnemyData);
                     selectedEnemies.Add(commonEnemy);
+                    
+                    commonEnemy.OnEnemyDeath += () =>
+                    {
+                        if (selectedEnemies.All(e => e.IsDead))
+                        {
+                            _VictoryPopup.gameObject.SetActive(true);
+                            RemoveHandView();
+                            Debug.Log("You Win");
+                        }
+                    };
                 }
             }
 

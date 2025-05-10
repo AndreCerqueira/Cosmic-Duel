@@ -15,7 +15,7 @@ namespace Project.Runtime.Scripts.Game.Matches
         private float _healthBarTransitionDuration = 0.25f;
         
         [Title("Player")]
-        [SerializeField] private int _startingHealth = 100;
+        //[SerializeField] private int _startingHealth = 100;
         [SerializeField] private DeckDataSO _deckData;
         [SerializeField] private string _playerName;
         
@@ -30,7 +30,7 @@ namespace Project.Runtime.Scripts.Game.Matches
         
         private void OnEnable()
         {
-            MatchPlayer = new MatchPlayer(_deckData, _playerName, _startingHealth);
+            MatchPlayer = new MatchPlayer(_deckData, _playerName, StatusManager.Instance.CurrentHealth, StatusManager.Instance.MaxHealth);
         }
 
         public void Setup(Slider healthBar, TextMeshProUGUI healthText, ArmorView armorView)
@@ -39,9 +39,9 @@ namespace Project.Runtime.Scripts.Game.Matches
             _healthText = healthText;
             _armorView = armorView;
             
-            _healthBar.maxValue = MatchPlayer.Health;
+            _healthBar.maxValue = MatchPlayer.MaxHealth;
             _healthBar.value = MatchPlayer.Health;
-            _healthText.text = $"{MatchPlayer.Health.ToString()}/{MatchPlayer.Health.ToString()}";
+            _healthText.text = $"{MatchPlayer.Health.ToString()}/{MatchPlayer.MaxHealth.ToString()}";
         }
 
         public void DealDamage(int amount)
