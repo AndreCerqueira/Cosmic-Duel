@@ -304,6 +304,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _allEnemies:
   - {fileID: 11400000, guid: 477f26d3946711c4ba0d5c76025258d9, type: 2}
+  - {fileID: 11400000, guid: efd381071d54a6a439614be24129fdb6, type: 2}
+  - {fileID: 11400000, guid: a6a55ad4924e381439d1f1b7775ae3df, type: 2}
   _enemySpawnPoints:
   - {fileID: 462043111}
   - {fileID: 1041112360}
@@ -3603,7 +3605,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 3
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 80c19bd5a61a74838817798a99a42ac9, type: 2}
   m_sharedMaterial: {fileID: -3845100613933225147, guid: 80c19bd5a61a74838817798a99a42ac9, type: 2}

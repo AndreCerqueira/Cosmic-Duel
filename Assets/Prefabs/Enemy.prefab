@@ -199,7 +199,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 340.767, y: 117.08499}
+  m_SizeDelta: {x: 304.04, y: 117.08499}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2178113891228434960
 GameObject:
@@ -239,7 +239,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 168.55667, y: -98.525665}
-  m_SizeDelta: {x: 336.576, y: 43.722}
+  m_SizeDelta: {x: 250, y: 43.722}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3280461512983236287
 MonoBehaviour:
@@ -627,7 +627,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.16992188, y: 0}
+  m_AnchoredPosition: {x: -0.16991425, y: 0}
   m_SizeDelta: {x: -0.72998047, y: -0.20999908}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7271495977862928895
@@ -702,7 +702,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -6.7000036, y: 28.579998}
+  m_AnchoredPosition: {x: 1.17, y: 28.579998}
   m_SizeDelta: {x: 202.4653, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5134777885853067311
@@ -1211,13 +1211,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d660b3654b623804895a58238eb11156, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyData: {fileID: 11400000, guid: 477f26d3946711c4ba0d5c76025258d9, type: 2}
   _artwork: {fileID: 3921891199188807626}
   _healthBar: {fileID: 3280461512983236287}
   _healthText: {fileID: 672215287462075815}
   _attack: {fileID: 3578361777156351475}
   _armorView: {fileID: 6756151722097863143}
   _animator: {fileID: 7617575624182966031}
+  _canvasTransform: {fileID: 353627659668240014}
+  EnemyData: {fileID: 0}
 --- !u!95 &7617575624182966031
 Animator:
   serializedVersion: 7

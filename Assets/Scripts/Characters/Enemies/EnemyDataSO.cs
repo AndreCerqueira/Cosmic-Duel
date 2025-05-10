@@ -9,11 +9,12 @@ namespace Characters.Enemies
     public class EnemyDataSO : SerializedScriptableObject
     {
         public new string Name;
-        public Sprite Artwork;
         
         [Title("Stats")]
         public int Health;
         public int BaseAttack;
+        public float Altura;
+        public bool needFlip;
         
         public AnimatorOverrideController EnemyAnimator;
     }

@@ -23,6 +23,7 @@ public class EnemyView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _attack;
     [SerializeField] private ArmorView _armorView;
     [SerializeField] private Animator _animator;
+    [SerializeField] private Transform _canvasTransform;
     
     public Attack NextAttack { get; private set; }
     
@@ -41,13 +42,17 @@ public class EnemyView : MonoBehaviour
     {
         EnemyData = enemyDataSo;
         
-        _artwork.sprite = EnemyData.Artwork;
         _healthBar.maxValue = EnemyData.Health;
         _healthBar.value = EnemyData.Health;
         _healthText.text = $"{EnemyData.Health.ToString()}/{EnemyData.Health.ToString()}";
         Health = EnemyData.Health;
         Armor = 0;
         _armorView.UpdateArmorText(Armor);
+
+        _canvasTransform.position = new Vector3(_canvasTransform.position.x, EnemyData.Altura, _canvasTransform.position.z);
+        
+        if (EnemyData.needFlip) 
+            _artwork.flipX = true;
         
         _animator.runtimeAnimatorController = EnemyData.EnemyAnimator;
 

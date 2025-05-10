@@ -64,6 +64,7 @@ namespace Cards.Systems
                 ActionSystem.Instance.AddReaction(performEffectGA);
             }
             
+            SelfMatchPlayer.Deck.AddCard(playCardGA.CardView.Card);
             SelfMatchPlayer.Hand.RemoveCard(playCardGA.CardView.Card);
             _handView.UpdateCardPositions();
             
