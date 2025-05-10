@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using Armor;
 using Characters.Enemies;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class Attack
 {
@@ -21,6 +23,7 @@ public class EnemyView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _healthText;
     [SerializeField] private TextMeshProUGUI _attack;
     [SerializeField] private ArmorView _armorView;
+    [SerializeField] private Animator _animator;
     
     public Attack NextAttack { get; private set; }
     
@@ -31,6 +34,8 @@ public class EnemyView : MonoBehaviour
     
     public EnemyDataSO EnemyData => _enemyData;
     
+    public event Action OnEnemyDeath; 
+    
     private void Start()
     {
         _artwork.sprite = _enemyData.Artwork;
@@ -40,6 +45,8 @@ public class EnemyView : MonoBehaviour
         Health = _enemyData.Health;
         Armor = 0;
         _armorView.UpdateArmorText(Armor);
+        
+        _animator.runtimeAnimatorController = _enemyData.EnemyAnimator;
 
         GenerateNextAttack();
     }
@@ -60,7 +67,7 @@ public class EnemyView : MonoBehaviour
         
         StartCoroutine(UpdateHealthBarSmoothly(Health));
         
-        if (Health <= 0) Debug.Log("Enemy defeated!");
+        if (Health <= 0) Die();
     }
     
     
@@ -149,5 +156,17 @@ public class EnemyView : MonoBehaviour
         };
 
         return attack;
+    }
+    
+    private void Die()
+    {
+        Debug.Log("Enemy defeated!");
+        OnEnemyDeath?.Invoke();
+        
+        Destroy(GetComponent<Collider>());
+
+        var rb = gameObject.AddComponent<Rigidbody>();
+
+        Destroy(gameObject, 5f);
     }
 }

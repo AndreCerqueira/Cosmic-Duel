@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Armor;
 using Cards.Data;
@@ -23,6 +24,8 @@ namespace Project.Runtime.Scripts.Game.Matches
         private Slider _healthBar;
         private TextMeshProUGUI _healthText;
         private ArmorView _armorView;
+        
+        public event Action OnPlayerDeath;
         
         
         private void OnEnable()
@@ -56,7 +59,7 @@ namespace Project.Runtime.Scripts.Game.Matches
             
             StartCoroutine(UpdateHealthBarSmoothly(MatchPlayer.Health));
 
-            if (MatchPlayer.Health <= 0) Debug.Log("Player defeated!");
+            if (MatchPlayer.Health <= 0) Die();
         }
         
         public void GainArmor(int amount)
@@ -71,6 +74,18 @@ namespace Project.Runtime.Scripts.Game.Matches
             _armorView.UpdateArmorText(MatchPlayer.Armor);
         }
         
+    
+        private void Die()
+        {
+            Debug.Log("Player defeated!");
+            OnPlayerDeath?.Invoke();
+        
+            Destroy(GetComponent<Collider>());
+
+            var rb = gameObject.AddComponent<Rigidbody>();
+
+            Destroy(gameObject, 5f);
+        }
     
     
         private IEnumerator UpdateHealthBarSmoothly(int targetHealth)

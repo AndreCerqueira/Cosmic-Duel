@@ -1,6 +1,7 @@
 using System;
 using Armor;
 using DG.Tweening;
+using MoreMountains.Feedbacks;
 using Project.Runtime.Scripts.Game.Cards.View;
 using Project.Runtime.Scripts.Game.Matches;
 using Project.Runtime.Scripts.General;
@@ -26,6 +27,10 @@ namespace Match
         [SerializeField] private Slider _playerHealthBar;
         [SerializeField] private TextMeshProUGUI _playerHealthText;
         [SerializeField] private ArmorView _playerArmorView;
+        
+        [Title("Feedbacks")]
+        [SerializeField] private Transform _GameOverPopup;
+        [SerializeField] private Transform _VictoryPopup;
 
         public MatchPlayer SelfPlayer => _match.SelfPlayer;
         [NonSerialized] public MatchPlayerController SelfPlayerController;
@@ -41,6 +46,18 @@ namespace Match
             SelfPlayerController = player;
             
             player.MatchPlayer.OnEnergyChanged += EnergySystem.Instance.UpdateEnergyText;
+            player.OnPlayerDeath += () =>
+            {
+                _GameOverPopup.gameObject.SetActive(true);
+                RemoveHandView();
+                Debug.Log("Game Over");
+            };
+            enemy.OnEnemyDeath += () =>
+            {
+                _VictoryPopup.gameObject.SetActive(true);
+                RemoveHandView();
+                Debug.Log("You Win");
+            };
             
             _match = new Project.Runtime.Scripts.Game.Matches.Match(player.MatchPlayer, enemy);
 
@@ -65,6 +82,18 @@ namespace Match
             MoveEnemyToStartPosition(Enemy.transform);
         }
         
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        // -----------
 
         private void MovePlayerToStartPosition(Transform playerTransform, Action onComplete = null)
         {
@@ -79,6 +108,15 @@ namespace Match
         private void PopInTurnButton(Vector3 targetScale)
         {
             _turnButton.transform.DOScale(targetScale, 1f).SetEase(Ease.OutBack);
+        }
+
+        private void RemoveHandView()
+        {
+            Destroy(_handView.GetComponent<Collider>());
+
+            var rb = _handView.gameObject.AddComponent<Rigidbody>();
+            
+            Destroy(_handView, 5f);
         }
     }
 }

@@ -14,5 +14,7 @@ namespace Characters.Enemies
         [Title("Stats")]
         public int Health;
         public int BaseAttack;
+        
+        public AnimatorOverrideController EnemyAnimator;
     }
 }
