@@ -2043,6 +2043,7 @@ GameObject:
   - component: {fileID: 209598210}
   - component: {fileID: 209598213}
   - component: {fileID: 209598212}
+  - component: {fileID: 209598214}
   m_Layer: 5
   m_Name: Space
   m_TagString: Untagged
@@ -2107,6 +2108,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 209598209}
   m_CullTransparentMesh: 1
+--- !u!225 &209598214
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 209598209}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &227516765
 GameObject:
   m_ObjectHideFlags: 0
@@ -9571,6 +9584,37 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &1355636787
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1355636788}
+  m_Layer: 7
+  m_Name: EnemyAttackDest
+  m_TagString: Character
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1355636788
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1355636787}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4.3, y: 1.51, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1381776143
 GameObject:
   m_ObjectHideFlags: 0
@@ -11399,8 +11443,8 @@ CanvasGroup:
   m_GameObject: {fileID: 1622990323}
   m_Enabled: 1
   m_Alpha: 0.12
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!114 &1622990326
 MonoBehaviour:
@@ -12633,6 +12677,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5dda97026c0b0a43b91a2eb164c30dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _enemyAttackDestination: {fileID: 1355636788}
   _changeToEnemyTurnFeedback: {fileID: 153188673}
   _changeToPlayerTurnFeedback: {fileID: 261439649}
 --- !u!1 &1950538487
@@ -17094,3 +17139,4 @@ SceneRoots:
   - {fileID: 655059455}
   - {fileID: 1955333246}
   - {fileID: 1956356483}
+  - {fileID: 1355636788}

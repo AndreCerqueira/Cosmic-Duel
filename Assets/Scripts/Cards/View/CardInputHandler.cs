@@ -153,8 +153,16 @@ namespace Cards.View
                 _collider.enabled = false;
                 
                 var areaTransform = hit.collider.transform;
+
+                var dropPosition = hit.point;// + Vector3.up * 0.1f; // pequeno offset visual
                 
-                _animator.AnimateDrop(areaTransform, () => 
+                // add offset to the left
+                var offset = new Vector3(-2f, -0.5f, 0f);
+                dropPosition += offset;
+                
+                var dropRotation = Quaternion.identity;
+                
+                _animator.AnimateDrop(dropPosition, dropRotation, () =>
                 {
                     Debug.Log("Card successfully dropped and parented to " + (transform.parent != null ? transform.parent.name : "root"));
                     

@@ -41,7 +41,7 @@ namespace Match
 
         public MatchPlayer SelfPlayer => _match.SelfPlayer;
         [NonSerialized] public MatchPlayerController SelfPlayerController;
-        public EnemyView Enemy => _match.Enemy;
+        public List<EnemyView> Enemies { get; private set; } = new List<EnemyView>();
         
         private void Start()
         {
@@ -60,6 +60,7 @@ namespace Match
             };
             
             var enemies = SpawnEnemies();
+            Enemies.AddRange(enemies);
             _match = new Project.Runtime.Scripts.Game.Matches.Match(player.MatchPlayer, enemies.FirstOrDefault());
 
             StartMatch(enemies);

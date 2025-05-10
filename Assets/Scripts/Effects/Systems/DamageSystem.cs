@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Cards.Systems;
 using Effects.GA;
 using Match;
@@ -11,7 +12,7 @@ public class DamageSystem : Singleton<MonoBehaviour>
 {
     private static MatchPlayerController SelfMatchPlayer => MatchController.Instance.SelfPlayerController;
     
-    private static EnemyView EnemyView => MatchController.Instance.Enemy;
+    private static List<EnemyView> EnemyViews => MatchController.Instance.Enemies;
 
     public GameObject SelectedObjectToDamage => CardSystem.Instance.SelectedObjectWithCard;
     

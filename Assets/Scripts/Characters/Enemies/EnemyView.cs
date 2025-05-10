@@ -12,6 +12,7 @@ public class Attack
 {
     public int Damage;
     public int Armor;
+    public bool IsImpredictable;
 }
 
 
@@ -115,12 +116,31 @@ public class EnemyView : MonoBehaviour
     }
     
     
+    public void RevealHiddenAttack()
+    {
+        if (NextAttack.IsImpredictable)
+        {
+            _attack.text = "Next turn: ";
+        
+            if (NextAttack.Damage > 0)
+            {
+                _attack.text += $"{NextAttack.Damage} <sprite name=sword>";
+            }
+        
+            if (NextAttack.Armor > 0)
+            {
+                _attack.text += $"{NextAttack.Armor} <sprite name=shield>";
+            }
+        }
+    }
+    
+    
     public void GenerateNextAttack()
     {
         float chance = Random.value;
         bool isImpredictable = chance < 0.3f;
         
-        NextAttack = GenerateAttack();
+        NextAttack = GenerateAttack(isImpredictable);
 
         if (isImpredictable) {
             _attack.text = "Next turn: ?";
@@ -141,7 +161,7 @@ public class EnemyView : MonoBehaviour
     }
     
     
-    private Attack GenerateAttack()
+    private Attack GenerateAttack(bool isImpredictable)
     {
         // choose one randomly 75% to damage, 25% to armor
         int randomValue = Random.Range(0, 100);
@@ -162,7 +182,8 @@ public class EnemyView : MonoBehaviour
         Attack attack = new Attack
         {
             Damage = damage,
-            Armor = armor
+            Armor = armor,
+            IsImpredictable = isImpredictable
         };
 
         return attack;
