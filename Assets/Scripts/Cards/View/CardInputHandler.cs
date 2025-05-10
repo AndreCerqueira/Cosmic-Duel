@@ -196,7 +196,7 @@ namespace Cards.View
             return true;
         }
 
-        private void ReturnToOriginalPosition()
+        public void ReturnToOriginalPosition()
         {
             CursorManager.Instance.SetDefaultCursor();
             _animator.AnimateReturn(_originalScale, _originalPosition, _originalRotation);

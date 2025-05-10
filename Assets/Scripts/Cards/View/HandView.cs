@@ -28,7 +28,7 @@ namespace Project.Runtime.Scripts.Game.Cards.View
         [SerializeField] private MMF_Player _cardEndDragFeedback;
         
         [Title("Card Views")]
-        [SerializeField] private List<CardView> _cardViews = new();
+        public List<CardView> _cardViews = new();
 
         public void Setup(Hand hand, List<CardView> cardViews = null)
         {

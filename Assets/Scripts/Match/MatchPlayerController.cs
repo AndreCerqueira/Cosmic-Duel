@@ -40,15 +40,19 @@ namespace Project.Runtime.Scripts.Game.Matches
 
         public void DealDamage(int amount)
         {
-            MatchPlayer.DealDamage(amount);
-            _healthBar.value = MatchPlayer.Health;
-            _healthText.text = $"{MatchPlayer.Health.ToString()}/{MatchPlayer.MaxHealth.ToString()}";
-            
-            if (MatchPlayer.Health <= 0)
+            if (MatchPlayer.Armor > 0)
             {
-                // Handle player defeat
-                Debug.Log("Player defeated!");
+                int damageToArmor = Mathf.Min(amount, MatchPlayer.Armor);
+                MatchPlayer.Armor -= damageToArmor;
+                amount -= damageToArmor;
             }
+
+            if (amount > 0) MatchPlayer.Health -= amount;
+
+            _healthBar.value = MatchPlayer.Health;
+            _healthText.text = $"{MatchPlayer.Health}/{MatchPlayer.MaxHealth}";
+
+            if (MatchPlayer.Health <= 0) Debug.Log("Player defeated!");
         }
         
         public void GainArmor(int amount)

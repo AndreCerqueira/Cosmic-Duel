@@ -34,15 +34,20 @@ public class EnemyView : MonoBehaviour
 
     public void DealDamage(int amount)
     {
-        Health -= amount;
-        _healthBar.value = Health;
-        _healthText.text = $"{Health.ToString()}/{_enemyData.Health.ToString()}";
-        
-        if (Health <= 0)
+        if (Armor > 0)
         {
-            // Handle enemy defeat
-            Debug.Log("Enemy defeated!");
+            int damageToArmor = Mathf.Min(amount, Armor);
+            Armor -= damageToArmor;
+            amount -= damageToArmor;
         }
+
+        if (amount > 0) Health -= amount;
+        
+        _armorView.UpdateArmorText(Armor);
+        _healthBar.value = Health;
+        _healthText.text = $"{Health}/{_enemyData.Health}";
+        
+        if (Health <= 0) Debug.Log("Enemy defeated!");
     }
     
     

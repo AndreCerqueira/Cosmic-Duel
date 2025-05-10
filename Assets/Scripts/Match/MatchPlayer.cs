@@ -1,3 +1,4 @@
+using System;
 using Cards.Data;
 using Cards.Models;
 using JetBrains.Annotations;
@@ -22,6 +23,10 @@ namespace Match
         public int MaxHealth;
         
         public int Armor { get; set; }
+        public int Energy { get; set; }
+        
+        
+        public event Action OnEnergyChanged; 
         
         
         public MatchPlayer(DeckDataSO deckData, string name, int health)
@@ -29,6 +34,7 @@ namespace Match
             Health = health;
             MaxHealth = health;
             Armor = 0;
+            Energy = 3;
             _deckData = deckData;
             Name = name;
             Deck = new Deck(_deckData);
@@ -73,6 +79,14 @@ namespace Match
             if (Health < 0) Health = 0;
             
             Debug.Log($"{Name} took {amount} damage. Remaining health: {Health}");
+        }
+        
+        
+        public void GainEnergy(int amount)
+        {
+            Energy += amount;
+            OnEnergyChanged?.Invoke();
+            Debug.Log($"{Name} gained {amount} energy. Total energy: {Energy}");
         }
     }
 }

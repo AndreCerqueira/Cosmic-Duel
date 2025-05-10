@@ -1,5 +1,6 @@
 using System.Collections;
 using Cards.Systems.GA;
+using Cards.View;
 using Match;
 using Project.Runtime.Scripts.Game.Cards.View;
 using Project.Runtime.Scripts.Game.Matches;
@@ -59,7 +60,10 @@ namespace Cards.Systems
                 PerformEffectGA performEffectGA = new(effect);
                 ActionSystem.Instance.AddReaction(performEffectGA);
             }
-
+            
+            SelfMatchPlayer.Hand.RemoveCard(playCardGA.CardView.Card);
+            _handView.UpdateCardPositions();
+            
             yield return null;
         }
 
