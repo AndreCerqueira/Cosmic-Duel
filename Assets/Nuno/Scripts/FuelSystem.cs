@@ -46,8 +46,15 @@ public class FuelSystem : MonoBehaviour
         return true;
     }
 
+    public void SetFuel(float value)
+    {
+        CurrentFuel = Mathf.Clamp(value, 0f, maxFuel);
+        RefreshUI();
+    }
+
+
     /* ---------- UI helper ---------- */
-    private void RefreshUI()
+    public void RefreshUI()
     {
         fuelSlider.value = CurrentFuel;
 

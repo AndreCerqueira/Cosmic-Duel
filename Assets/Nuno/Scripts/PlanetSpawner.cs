@@ -3,7 +3,8 @@ using UnityEngine;
 using TMPro;
 
 /// Instancia planetas em posições aleatórias dentro da câmara,
-/// respeitando um “padding” às bordas.
+/// respeitando um padding às bordas. Só cria se ainda não existirem
+/// estados guardados no GameManager.
 public class PlanetSpawner : MonoBehaviour
 {
     /* ---------- Inspector ---------- */
@@ -23,10 +24,8 @@ public class PlanetSpawner : MonoBehaviour
     [Header("Distância mínima entre planetas")]
     [SerializeField] private float minDistance = 1f;
 
-    [Header("Padding (recuo a partir da borda visível)")]
+    [Header("Padding (borda visível)")]
     [SerializeField] private Vector2 padding = new Vector2(1f, 1f);
-
-
 
     [Header("Dependências")]
     [SerializeField] private ShipMover ship;
@@ -34,6 +33,8 @@ public class PlanetSpawner : MonoBehaviour
     [SerializeField] private TextMeshPro costLabel;
     [SerializeField] private FuelSystem fuelSystem;
     [SerializeField] private TextMeshPro fuelCostLabel;
+
+    [Header("Dificuldade")]
     [SerializeField] private int minDifficulty = 1;
     [SerializeField] private int maxDifficulty = 5;
     [SerializeField] private float mysteryChance = 0.2f;
@@ -41,49 +42,47 @@ public class PlanetSpawner : MonoBehaviour
     /* ---------- rectângulo calculado ---------- */
     private float minX, maxX, minY, maxY;
 
-    /* ---------- ciclo ---------- */
+    /* ---------- Awake ---------- */
     private void Awake()
     {
         if (targetCamera == null) targetCamera = Camera.main;
-        if (targetCamera == null)
+        if (targetCamera == null || !targetCamera.orthographic)
         {
-            Debug.LogError("PlanetSpawner: não encontrou Camera.");
+            Debug.LogError("PlanetSpawner: precisa de Camera ortográfica.");
             enabled = false; return;
         }
 
-        if (!targetCamera.orthographic)
-        {
-            Debug.LogError("PlanetSpawner: script pensado para câmara ortográfica.");
-            enabled = false; return;
-        }
+        float halfH = targetCamera.orthographicSize;
+        float halfW = halfH * targetCamera.aspect;
+        Vector3 cam = targetCamera.transform.position;
 
-        /* 1) calcular as bordas internas com padding */
-        float halfHeight = targetCamera.orthographicSize;
-        float halfWidth = halfHeight * targetCamera.aspect;
-
-        Vector3 camPos = targetCamera.transform.position;
-
-        minX = camPos.x - halfWidth + padding.x;
-        maxX = camPos.x + halfWidth - padding.x;
-        minY = camPos.y - halfHeight + padding.y;
-        maxY = camPos.y + halfHeight - padding.y;
+        minX = cam.x - halfW + padding.x;
+        maxX = cam.x + halfW - padding.x;
+        minY = cam.y - halfH + padding.y;
+        maxY = cam.y + halfH - padding.y;
     }
 
+    /* ---------- Start ---------- */
     private void Start()
     {
         if (!enabled) return;
 
+        // ─── 0) já existem planetas guardados? então não cria nada ───
+        if (GameManager.Instance != null && GameManager.Instance.planets.Count > 0)
+            return;
+
+        // ─── 1) validações ───
         if (planetPrefab == null || planetSprites.Count == 0 || planetCount <= 0)
         {
-            Debug.LogWarning("PlanetSpawner: faltam referências ou planetCount ≤ 0.");
+            Debug.LogWarning("PlanetSpawner: faltam referências ou planetCount <= 0.");
             return;
         }
 
-        /* baralhar sprites */
+        // baralha sprites para não repetir padrão
         List<Sprite> shuffled = new List<Sprite>(planetSprites);
         Shuffle(shuffled);
 
-        /* instanciar */
+        // ─── 2) instanciar planetas ───
         for (int i = 0; i < planetCount; i++)
         {
             Vector3 pos;
@@ -102,28 +101,40 @@ public class PlanetSpawner : MonoBehaviour
                 continue;
             }
 
+            // criar planeta
+            GameObject go = Instantiate(planetPrefab, pos, Quaternion.identity);
 
-            var planet = Instantiate(planetPrefab, pos, Quaternion.identity);
-
+            // dificuldade & mistério
             int diff = Random.Range(minDifficulty, maxDifficulty + 1);
-            bool mystery = (Random.value < mysteryChance);
+            bool mystery = Random.value < mysteryChance;
 
-            planet.GetComponent<Planet>()
-                  .Setup(ship, line, costLabel, fuelSystem, fuelCostLabel, diff, mystery);
-            /*
-            var planet = Instantiate(planetPrefab, pos, Quaternion.identity);
-            planet.GetComponent<Planet>().Setup(ship, line, costLabel);
-            */
-            Sprite chosen = shuffled[i % shuffled.Count];
-            planet.GetComponent<SpriteRenderer>().sprite = chosen;
+            // índice real dentro do GameManager (antes de adicionar)
+            int planetIndex = GameManager.Instance.planets.Count;
+
+            // configurar script Planet
+            Planet p = go.GetComponent<Planet>();
+            p.PlanetIndex = planetIndex;
+            p.Setup(ship, line, costLabel, fuelSystem, fuelCostLabel, diff, mystery);
+
+            // sprite visual
+            go.GetComponent<SpriteRenderer>().sprite = shuffled[i % shuffled.Count];
+
+            // guardar estado persistente
+            GameManager.Instance.planets.Add(new GameManager.PlanetState
+            {
+                position = pos,
+                difficulty = diff,
+                mystery = mystery,
+                completed = false
+            });
         }
     }
 
-    /* ---------- helper ---------- */
+    /* ---------- helpers ---------- */
     private Vector3 RandomPointInCamera() =>
         new Vector3(Random.Range(minX, maxX),
                     Random.Range(minY, maxY),
-                    0f);                    // Z fixo em 2D
+                    0f);
 
     private void Shuffle<T>(IList<T> list)
     {

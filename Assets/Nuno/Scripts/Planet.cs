@@ -43,6 +43,9 @@ public class Planet : MonoBehaviour
     private bool hovering;
     private bool selected;
     private bool isInitialized;
+    public int PlanetIndex { get; set; }
+
+
 
     private Material auraMat;
     private static Planet currentTarget;
@@ -115,6 +118,8 @@ public class Planet : MonoBehaviour
         SetAura(selectedColor);
 
         ship.MoveTo(transform.position);
+
+        GameManager.Instance.EnterPlanet(PlanetIndex);
 
         //RefreshInfo();                 // recalcula se quiseres valor exacto após clique
     }
@@ -204,6 +209,11 @@ public class Planet : MonoBehaviour
         }
     }
 
+    public void HideDifficultyIcon()
+    {
+        if (difficultyIconRenderer != null)
+            difficultyIconRenderer.enabled = false;
+    }
 
 
     /* ---------- API usado pelo Spawner ---------- */
