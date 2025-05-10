@@ -1,3 +1,4 @@
+using System.Collections;
 using Armor;
 using Cards.Data;
 using Match;
@@ -10,6 +11,8 @@ namespace Project.Runtime.Scripts.Game.Matches
 {
     public class MatchPlayerController : MonoBehaviour
     {
+        private float _healthBarTransitionDuration = 0.25f;
+        
         [Title("Player")]
         [SerializeField] private int _startingHealth = 100;
         [SerializeField] private DeckDataSO _deckData;
@@ -50,8 +53,8 @@ namespace Project.Runtime.Scripts.Game.Matches
             if (amount > 0) MatchPlayer.Health -= amount;
 
             _armorView.UpdateArmorText(MatchPlayer.Armor);
-            _healthBar.value = MatchPlayer.Health;
-            _healthText.text = $"{MatchPlayer.Health}/{MatchPlayer.MaxHealth}";
+            
+            StartCoroutine(UpdateHealthBarSmoothly(MatchPlayer.Health));
 
             if (MatchPlayer.Health <= 0) Debug.Log("Player defeated!");
         }
@@ -66,6 +69,26 @@ namespace Project.Runtime.Scripts.Game.Matches
         {
             MatchPlayer.Armor = 0;
             _armorView.UpdateArmorText(MatchPlayer.Armor);
+        }
+        
+    
+    
+        private IEnumerator UpdateHealthBarSmoothly(int targetHealth)
+        {
+            float startValue = _healthBar.value;
+            float endValue = Mathf.Clamp(targetHealth, 0, MatchPlayer.Health);
+            float elapsedTime = 0f;
+
+            while (elapsedTime < _healthBarTransitionDuration)
+            {
+                _healthBar.value = Mathf.Lerp(startValue, endValue, elapsedTime / _healthBarTransitionDuration);
+                _healthText.text = $"{(int)_healthBar.value}/{MatchPlayer.MaxHealth}";
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+
+            _healthBar.value = endValue;
+            _healthText.text = $"{(int)_healthBar.value}/{MatchPlayer.MaxHealth}";
         }
     }
 }
