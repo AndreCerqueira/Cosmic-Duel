@@ -25,33 +25,31 @@ public class Planet : MonoBehaviour
     [SerializeField] private float dashLength = 0.25f;
 
     [Header("UI do custo de combustível")]
-    //[SerializeField] private Vector3 fuelLabelOffset = new Vector3(3f, 0f, 0f);   // ↑ deslocamento
-    [SerializeField] private Color fuelLabelColor = Color.red;                 // cor do texto
-
-
+    [SerializeField] private Color fuelLabelColor = Color.red;
 
     /* ---------- estado ---------- */
     private bool hovering;
-    private bool isInitialized;
     private bool selected;
+    private bool isInitialized;
 
     private Material auraMat;
-
-    private static Planet currentTarget;          // <- planeta destino global
+    private static Planet currentTarget;
     private static readonly int AURA_ID = Shader.PropertyToID("_OutlineColor");
+
+    /* ---------- cache de texto ---------- */
+    private string cachedCostText = "";
+    private string cachedFuelText = "";
 
     /* ---------- SETUP ---------- */
     private void Awake()
     {
-        auraMat = GetComponent<SpriteRenderer>().material;   // cópia p/ instância
+        auraMat = GetComponent<SpriteRenderer>().material;
         SetAura(idleColor);
     }
 
     /* ---------- EVENTOS DE RATO ---------- */
     private void OnMouseEnter()
     {
-
-
         hovering = true;
         if (!selected) SetAura(hoverColor);
 
@@ -59,66 +57,71 @@ public class Planet : MonoBehaviour
         costLabel.gameObject.SetActive(true);
         fuelCostLabel.gameObject.SetActive(true);
 
+        RefreshInfo();                 // <-- calcula só uma vez
     }
 
     private void OnMouseExit()
     {
-
-        // onde já ligas costLabel & line
-
         hovering = false;
         if (!selected) SetAura(idleColor);
 
         line.enabled = false;
         costLabel.gameObject.SetActive(false);
         fuelCostLabel.gameObject.SetActive(false);
-
     }
 
     private void OnMouseDown()
     {
         float distance = Vector3.Distance(transform.position, ship.transform.position);
 
-        // pergunta ao FuelSystem se há combustível
-        if (!fuel.TryConsumeForDistance(distance)) return;   // sem fuel ⇒ não viaja
+        if (!fuel.TryConsumeForDistance(distance)) return;
 
-        /* 1) dizer ao destino antigo para desmarcar-se */
         if (currentTarget != null && currentTarget != this)
             currentTarget.Deselect();
 
-        /* 2) este passa a ser o novo destino */
         currentTarget = this;
         selected = true;
         SetAura(selectedColor);
 
         ship.MoveTo(transform.position);
+
+        //RefreshInfo();                 // recalcula se quiseres valor exacto após clique
     }
 
     /* ---------- LOOP ---------- */
     private void Update()
     {
-        if (!hovering) return;
-        if (!isInitialized) return;
+        if (!hovering || !isInitialized) return;
 
         Vector3 shipPos = ship.transform.position;
         Vector3 planetPos = transform.position;
 
+        // Actualiza apenas posições da UI e linha
+        fuelCostLabel.transform.position = shipPos + Vector3.up * 1f;
+        costLabel.transform.position = planetPos + Vector3.down * 20f;
+
+        float distReal = Vector3.Distance(shipPos, planetPos);
+        UpdateLine(shipPos, planetPos, distReal);
+    }
+
+    /* ---------- cálculo pontual ---------- */
+    private void RefreshInfo()
+    {
+        Vector3 shipPos = ship.transform.position;
+        Vector3 planetPos = transform.position;
         float dist = Vector3.Distance(shipPos, planetPos);
+
+        // custo em créditos
         float cost = dist * costPerUnit;
+        cachedCostText = $"{cost:0} ×10¹² km";
+        costLabel.text = cachedCostText;
 
-        // ----- combustível que vai gastar -----
-        float fuelNeeded = dist * fuel.FuelPerUnit;          // torna FuelPerUnit público (getter) ou expõe
-        float percentSpend = fuelNeeded / fuel.MaxFuel * 100f; // % do reservatório total
-
-        fuelCostLabel.text = $"-{percentSpend:0}%";
-        fuelCostLabel.transform.position = shipPos + Vector3.up * 10f; // 2 unidades acima da nave
-        //fuelCostLabel.transform.position = shipPos + fuelLabelOffset;
-
-
-        UpdateLine(shipPos, planetPos, dist);
-
-        costLabel.text = $"{cost:0} ×10¹² km";
-        costLabel.transform.position = planetPos + Vector3.up * 4f;
+        // combustível
+        float fuelNeeded = dist * fuel.FuelPerUnit;
+        float percentSpend = fuelNeeded / fuel.MaxFuel * 100f;
+        int percInt = Mathf.CeilToInt(percentSpend);
+        cachedFuelText = $"-{percInt} <voffset=0.9em><sprite name=fuel></voffset>";
+        fuelCostLabel.text = cachedFuelText;
     }
 
     /* ---------- HELPERS ---------- */
@@ -141,7 +144,8 @@ public class Planet : MonoBehaviour
     }
 
     /* ---------- API usado pelo Spawner ---------- */
-    public void Setup(ShipMover s, LineRenderer l, TextMeshPro label, FuelSystem f, TextMeshPro fuelCostLabel)
+    public void Setup(ShipMover s, LineRenderer l, TextMeshPro label,
+                      FuelSystem f, TextMeshPro fuelCostLabel)
     {
         ship = s;
         line = l;
