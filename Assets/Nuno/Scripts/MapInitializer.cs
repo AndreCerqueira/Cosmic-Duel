@@ -51,7 +51,8 @@ public class MapInitializer : MonoBehaviour
 
         bool reachable = GameManager.Instance.IsAnyPlanetReachable(
                         ship.transform.position,
-                        fs.CurrentFuel,  // % que resta
+                        //fs.CurrentFuel,  // % que resta
+                        StatusManager.Instance.CurrentFuel,
                         fs.FuelPerUnit,
                         fs.MaxFuel);
 

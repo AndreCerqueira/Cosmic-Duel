@@ -1,4 +1,5 @@
 using MoreMountains.Feedbacks;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -84,7 +85,9 @@ public class GameManager : MonoBehaviour
 
             float distUnits = Vector3.Distance(shipPos, st.position);
             float needUnits = distUnits * fuelPerUnit;
-            float needPercent = needUnits / maxFuel * 100f;
+            float needPercent = needUnits;// / maxFuel * 100f;
+
+            Debug.Log($"[GM] {st.difficulty} - {needPercent}% - {fuelLeftPercent}%");
 
             if (needPercent <= fuelLeftPercent)
                 return true;           // existe pelo menos 1 destino
@@ -92,5 +95,14 @@ public class GameManager : MonoBehaviour
         return false;                  // nenhum planeta é alcançável
     }
 
+    internal void ResetGame()
+    {
+        Debug.Log("[GM] Reset Game");
+        planets.Clear();
+        spaceObjects.Clear();
+        currentFuel = 1000f;
+        CurrentPlanetIndex = -1;
+        shipPosition = Vector3.zero;   // reposicionar nave no mapa
 
+    }
 }

@@ -77,7 +77,7 @@ public class StatusManager : MonoBehaviour
     {
         DamageBonus = 0;
         ArmorBonus = 0;
-        MaxHealth = 100;
+        MaxHealth = 50;
         CurrentHealth = MaxHealth;
         MaxFuel = 1000f;
         CurrentFuel = MaxFuel;

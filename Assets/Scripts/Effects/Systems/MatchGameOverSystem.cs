@@ -7,7 +7,7 @@ public class MatchGameOverSystem : Singleton<MatchGameOverSystem>
 {
     [SerializeField] private MMF_Player _loseChangeScreenFeedback;
     [SerializeField] private MMF_Player _winChangeScreenFeedback;
-    
+
     public void GameOver(bool isWin)
     {
         if (isWin)
@@ -17,7 +17,8 @@ public class MatchGameOverSystem : Singleton<MatchGameOverSystem>
         else
         {
             StatusManager.Instance.ResetStatus();
-            
+            GameManager.Instance.ResetGame();
+
             _loseChangeScreenFeedback?.PlayFeedbacks();
         }
     }

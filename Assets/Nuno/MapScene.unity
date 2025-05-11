@@ -727,6 +727,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fuelSystem: {fileID: 676573177}
   ship: {fileID: 1912102162}
+  gameOverPop: {fileID: 2042503517}
 --- !u!4 &371294882
 Transform:
   m_ObjectHideFlags: 0
@@ -1291,7 +1292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxFuel: 1000
-  fuelPerUnit: 2
+  fuelPerUnit: 4
   fuelSlider: {fileID: 8664374594796120966}
   fuelLabel: {fileID: 3764518960616643335}
 --- !u!1 &768800861

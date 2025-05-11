@@ -12,13 +12,13 @@ using UnityEngine.UI;
 public class TreasureManager : Singleton<TreasureManager>
 {
     private static MatchPlayerController SelfMatchPlayer => MatchController.Instance.SelfPlayerController;
-    
+
     [SerializeField] private MMF_Player _closeTreasurePopupFeedback;
-    
+
     [SerializeField] private TreasureDataSO[] _treasureDataSos;
-    
+
     [SerializeField] private TreasureView[] _treasureViews;
-    
+
     public void Setup()
     {
         Debug.Log("TreasureManager started");
@@ -37,10 +37,10 @@ public class TreasureManager : Singleton<TreasureManager>
             {
                 OnTreasureClicked(treasureData);
             };
-            
+
             _treasureViews[i].Setup(treasureData);
             _treasureViews[i].InputHandler.Setup(onClick);
-            
+
             Vector3 targetPosition = i switch
             {
                 0 => new Vector3(-5f, 3f, 0f),
@@ -53,17 +53,17 @@ public class TreasureManager : Singleton<TreasureManager>
             _treasureViews[i].transform.DOLocalMove(targetPosition, 0.5f).SetEase(Ease.OutQuad);
         }
     }
-    
+
     private void OnTreasureClicked(TreasureDataSO data)
     {
         DisableAllInputs();
-    
+
         switch (data.Id)
         {
-            case 0: 
+            case 0:
                 GainHealthBonus();
                 break;
-            case 1: 
+            case 1:
                 GainFuelBonus();
                 break;
             case 2:
@@ -101,38 +101,38 @@ public class TreasureManager : Singleton<TreasureManager>
 
         return result;
     }
-    
+
     private void GainHealthBonus()
     {
         // Logic to gain health bonus
         Debug.Log("Gained Health Bonus!");
-        
+
         StatusManager.Instance.SetHealth(SelfMatchPlayer.MatchPlayer.Health);
         StatusManager.Instance.RegenHealth(10);
         SelfMatchPlayer.MatchPlayer.Health = StatusManager.Instance.CurrentHealth;
-        
+
         DoMatchEnd();
     }
-    
+
     private void GainFuelBonus()
     {
         // Logic to gain fuel bonus
         Debug.Log("Gained Fuel Bonus!");
-        
-        StatusManager.Instance.RegenFuel(10);
-        
+
+        StatusManager.Instance.RegenFuel(30);
+
         DoMatchEnd();
     }
-    
+
     private void GainArmorBonus()
     {
         // Logic to gain armor bonus
         Debug.Log("Gained Armor Bonus!");
         StatusManager.Instance.AddArmorBonus();
-        
+
         DoMatchEnd();
     }
-    
+
     private void GainDamageBonus()
     {
         // Logic to gain damage bonus
@@ -141,13 +141,13 @@ public class TreasureManager : Singleton<TreasureManager>
 
         DoMatchEnd();
     }
-    
+
     private void DoMatchEnd()
     {
         // Save remaining health
         Debug.Log("Saving remaining health");
         StatusManager.Instance.SetHealth(SelfMatchPlayer.MatchPlayer.Health);
-        
+
         var state = GameManager.Instance.CurrentPlanetState;
         if (state != null)
         {
@@ -155,7 +155,7 @@ public class TreasureManager : Singleton<TreasureManager>
             state.hidden = false;
         }
         GameManager.Instance.ExitPlanet();
-        
+
         _closeTreasurePopupFeedback?.PlayFeedbacks();
         MatchGameOverSystem.Instance.GameOver(true);
     }
