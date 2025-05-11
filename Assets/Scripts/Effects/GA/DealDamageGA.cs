@@ -4,8 +4,10 @@ using UnityEngine;
 public class DealDamageGA : GameAction
 {
     public int Amount { get; private set; }
-    public DealDamageGA(int amount)
+    public bool ToAllEnemies { get; private set; }
+    public DealDamageGA(int amount, bool toAllEnemies)
     {
+        ToAllEnemies = toAllEnemies;
         Amount = amount;
     }
 }

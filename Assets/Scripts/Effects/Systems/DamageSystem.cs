@@ -31,31 +31,49 @@ public class DamageSystem : Singleton<MonoBehaviour>
 
     private IEnumerator DealDamagePerformer(DealDamageGA action)
     {
-        // Check if the target is valid
-        if (SelectedObjectToDamage == null)
+        // Verificar se a ação deve afetar todos os inimigos
+        bool isToAllEnemies = action.ToAllEnemies;
+
+        if (isToAllEnemies)
         {
-            Debug.LogError("No target selected for damage.");
-            yield break;
-        }
-        
-        if (SelectedObjectToDamage.TryGetComponent(out MatchPlayerController player))
-        {
-            // Deal damage to the player
-            var bonusAmount = StatusManager.Instance.DamageBonus;
-            player.DealDamage(action.Amount + bonusAmount);
-        }
-        else if (SelectedObjectToDamage.TryGetComponent(out EnemyView enemy))
-        {
-            // Deal damage to the enemy
-            var bonusAmount = StatusManager.Instance.DamageBonus;
-            enemy.DealDamage(action.Amount + bonusAmount);
+            // Aplica dano a todos os inimigos
+            foreach (var enemy in EnemyViews)
+            {
+                if (enemy != null)
+                {
+                    var bonusAmount = StatusManager.Instance.DamageBonus;
+                    enemy.DealDamage(action.Amount + bonusAmount);
+                }
+            }
         }
         else
         {
-            Debug.LogError("Selected object is not a valid target for damage.");
-            yield break;
+            // Se o dano for para um único alvo, verificar qual é o alvo selecionado
+            if (SelectedObjectToDamage == null)
+            {
+                Debug.LogError("No target selected for damage.");
+                yield break;
+            }
+
+            if (SelectedObjectToDamage.TryGetComponent(out MatchPlayerController player))
+            {
+                // Dano para o jogador
+                var bonusAmount = StatusManager.Instance.DamageBonus;
+                player.DealDamage(action.Amount + bonusAmount);
+            }
+            else if (SelectedObjectToDamage.TryGetComponent(out EnemyView enemy))
+            {
+                // Dano para o inimigo
+                var bonusAmount = StatusManager.Instance.DamageBonus;
+                enemy.DealDamage(action.Amount + bonusAmount);
+            }
+            else
+            {
+                Debug.LogError("Selected object is not a valid target for damage.");
+                yield break;
+            }
         }
-        
+
         yield return null;
     }
     
