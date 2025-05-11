@@ -10,6 +10,8 @@ namespace Turn
 {
     public class TurnSystem : MonoBehaviour
     {
+        [SerializeField] private MMF_Player _enemyAttackFeedback;
+        
         private static MatchPlayerController SelfMatchPlayer => MatchController.Instance.SelfPlayerController;
         
         [SerializeField] private Transform _enemyAttackDestination;
@@ -59,6 +61,8 @@ namespace Turn
                 {
                     var targetPosition = _enemyAttackDestination.position;
                     yield return enemy.transform.DOMove(targetPosition, 0.2f).SetEase(Ease.OutQuad).WaitForCompletion();
+                    
+                    _enemyAttackFeedback?.PlayFeedbacks();
                     
                     player.DealDamage(attack.Damage);
                     Debug.Log($"{enemy.name} dealt {attack.Damage} damage.");
