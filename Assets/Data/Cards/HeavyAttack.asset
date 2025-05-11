@@ -33,7 +33,7 @@ MonoBehaviour:
       Data: 1|DamageEffectPlain, Assembly-CSharp
     - Name: amount
       Entry: 3
-      Data: 600
+      Data: 6
     - Name: 
       Entry: 8
       Data: 

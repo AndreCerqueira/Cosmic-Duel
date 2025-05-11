@@ -24,6 +24,8 @@ MonoBehaviour:
   Name: Fat Enemy
   Health: 15
   BaseAttack: 2
+  BaseArmor: 5
   Altura: 1
   needFlip: 0
+  IsBoss: 0
   EnemyAnimator: {fileID: 22100000, guid: 3e6618944d76a1149866862c093ddb23, type: 2}

@@ -45,6 +45,8 @@ namespace Match
         
         private void Start()
         {
+            //var state = GameManager.Instance.CurrentPlanetState.difficulty;
+            
             var player = Instantiate(_playerPrefab, _playerPrefabContainer).GetComponent<MatchPlayerController>();
             
             player.Setup(_playerHealthBar, _playerHealthText, _playerArmorView);
@@ -92,23 +94,46 @@ namespace Match
         
         private List<EnemyView> SpawnEnemies()
         {
-            var selectedEnemies = new List<EnemyView>();
+            string difficulty = "";
+            try
+            {
+                difficulty = GameManager.Instance.CurrentPlanetState.difficulty.ToString().ToLower();
+            }
+            catch (Exception _)
+            {
+            }
             
-            // Decida se o inimigo gerado será um Boss ou Mobs comuns
-            bool spawnBoss = UnityEngine.Random.Range(0, 2) == 0; // 50% de chance de spawnar um Boss
+            // Se não conseguir pegar a dificuldade, pega uma aleatória
+            if (string.IsNullOrEmpty(difficulty))
+            {
+                var difficulties = new List<string> { "easy", "medium", "hard", "boss" };
+                difficulty = difficulties[UnityEngine.Random.Range(0, difficulties.Count)];
+            }
+            
+            var selectedEnemies = new List<EnemyView>();
+
+            // Probabilidade crescente de boss conforme dificuldade
+            float bossChance = difficulty switch
+            {
+                "easy" => 0.0f,
+                "medium" => 0.2f,
+                "hard" => 0.5f,
+                "boss" => 1.0f,
+                _ => 0.1f
+            };
+
+            bool spawnBoss = UnityEngine.Random.value < bossChance;
 
             if (spawnBoss)
             {
-                // Se for um Boss, escolhe um único inimigo Boss e dobra o seu tamanho
                 var bossData = _allEnemies.FirstOrDefault(e => e.IsBoss);
                 if (bossData != null)
                 {
-                    var spawnPoint = _enemySpawnPoints[0]; // O Boss é o único, então ele ocupa a primeira posição
                     var boss = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
                     boss.Setup(bossData);
-                    boss.transform.localScale *= 2; // Dobra o tamanho do Boss
-                    boss._canvasTransform.localScale /= 2; 
-                    
+                    boss.transform.localScale *= 2;
+                    boss._canvasTransform.localScale /= 2;
+
                     boss.OnEnemyDeath += () =>
                     {
                         if (selectedEnemies.All(e => e.IsDead))
@@ -120,80 +145,40 @@ namespace Match
                     };
 
                     selectedEnemies.Add(boss);
+                    return selectedEnemies; // Boss ocupa o combate inteiro
                 }
-                else
+            }
+
+            // Caso não vá spawnar boss, decide quantos inimigos normais
+            int enemyCount = difficulty switch
+            {
+                "easy" => UnityEngine.Random.Range(1, 3), // 1 ou 2
+                "medium" => UnityEngine.Random.Range(2, 4), // 2 ou 3
+                "hard" => 3,
+                _ => UnityEngine.Random.Range(1, 3)
+            };
+
+            var commonEnemies = _allEnemies.Where(e => !e.IsBoss).ToList();
+
+            for (int i = 0; i < enemyCount && i < _enemySpawnPoints.Count; i++)
+            {
+                var enemyData = commonEnemies[UnityEngine.Random.Range(0, commonEnemies.Count)];
+
+                var spawnPoint = _enemySpawnPoints[i];
+                var enemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
+                enemy.Setup(enemyData);
+
+                enemy.OnEnemyDeath += () =>
                 {
-                    // Caso não haja um Boss disponível, forçamos a criação de pelo menos um inimigo comum
-                    var commonEnemyData = _allEnemies.FirstOrDefault(e => !e.IsBoss); // Busca um inimigo comum
-                    if (commonEnemyData != null)
+                    if (selectedEnemies.All(e => e.IsDead))
                     {
-                        var spawnPoint = _enemySpawnPoints[0];
-                        var commonEnemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
-                        commonEnemy.Setup(commonEnemyData);
-                        selectedEnemies.Add(commonEnemy);
-                        
-                        commonEnemy.OnEnemyDeath += () =>
-                        {
-                            if (selectedEnemies.All(e => e.IsDead))
-                            {
-                                _VictoryPopup.gameObject.SetActive(true);
-                                RemoveHandView();
-                                Debug.Log("You Win");
-                            }
-                        };
+                        _VictoryPopup.gameObject.SetActive(true);
+                        RemoveHandView();
+                        Debug.Log("You Win");
                     }
-                }
-            }
-            else
-            {
-                // Caso contrário, spawnar de 1 a 3 mobs comuns
-                int enemyCount = UnityEngine.Random.Range(1, 4); // 1 to 3
-                for (int i = 0; i < enemyCount; i++)
-                {
-                    var enemyData = _allEnemies[UnityEngine.Random.Range(0, _allEnemies.Count)];
-                    
-                    // Verifica se o inimigo não é um Boss
-                    if (enemyData.IsBoss) continue; // Não deve spawnar um Boss aqui
+                };
 
-                    var spawnPoint = _enemySpawnPoints[i];
-                    var enemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
-                    enemy.Setup(enemyData);
-
-                    enemy.OnEnemyDeath += () =>
-                    {
-                        if (selectedEnemies.All(e => e.IsDead))
-                        {
-                            _VictoryPopup.gameObject.SetActive(true);
-                            RemoveHandView();
-                            Debug.Log("You Win");
-                        }
-                    };
-
-                    selectedEnemies.Add(enemy);
-                }
-            }
-
-            // Caso a lista de inimigos ainda esteja vazia, força a criação de pelo menos um inimigo comum
-            if (selectedEnemies.Count == 0)
-            {
-                var commonEnemyData = _allEnemies.FirstOrDefault(e => !e.IsBoss);
-                if (commonEnemyData != null)
-                {
-                    var spawnPoint = _enemySpawnPoints[0];
-                    var commonEnemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
-                    commonEnemy.Setup(commonEnemyData);
-                    selectedEnemies.Add(commonEnemy);
-                    
-                    commonEnemy.OnEnemyDeath += () =>
-                    {
-                        if (selectedEnemies.All(e => e.IsDead))
-                        {
-                            _VictoryPopup.gameObject.SetActive(true);
-                            RemoveHandView();
-                            Debug.Log("You Win");
-                        }
-                    };
-                }
+                selectedEnemies.Add(enemy);
             }
 
             return selectedEnemies;

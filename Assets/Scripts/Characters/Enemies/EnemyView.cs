@@ -30,6 +30,7 @@ public class EnemyView : MonoBehaviour
     
     private float _healthBarTransitionDuration = 0.25f;
     
+    public int MaxHealth { get; private set; }
     public int Health { get; private set; }
     public int Armor { get; private set; }
     
@@ -43,10 +44,14 @@ public class EnemyView : MonoBehaviour
     {
         EnemyData = enemyDataSo;
         
-        _healthBar.maxValue = EnemyData.Health;
-        _healthBar.value = EnemyData.Health;
-        _healthText.text = $"{EnemyData.Health.ToString()}/{EnemyData.Health.ToString()}";
-        Health = EnemyData.Health;
+        float difficultyMultiplier = GetDifficultyMultiplier();
+        int scaledHealth = Mathf.RoundToInt(EnemyData.Health * difficultyMultiplier);
+        
+        MaxHealth = scaledHealth;
+        Health = scaledHealth;
+        _healthBar.maxValue = MaxHealth;
+        _healthBar.value = MaxHealth;
+        _healthText.text = $"{Health}/{MaxHealth}";
         Armor = 0;
         _armorView.UpdateArmorText(Armor);
 
@@ -99,20 +104,19 @@ public class EnemyView : MonoBehaviour
     private IEnumerator UpdateHealthBarSmoothly(int targetHealth)
     {
         float startValue = _healthBar.value;
-        float endValue = Mathf.Clamp(targetHealth, 0, EnemyData.Health);
+        float endValue = Mathf.Clamp(targetHealth, 0, MaxHealth);
         float elapsedTime = 0f;
 
         while (elapsedTime < _healthBarTransitionDuration)
         {
             _healthBar.value = Mathf.Lerp(startValue, endValue, elapsedTime / _healthBarTransitionDuration);
-            _healthText.text = $"{(int)_healthBar.value}/{EnemyData.Health}";
+            _healthText.text = $"{(int)_healthBar.value}/{MaxHealth}";
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        // Garantir que o valor final seja exatamente o alvo
         _healthBar.value = endValue;
-        _healthText.text = $"{(int)_healthBar.value}/{EnemyData.Health}";
+        _healthText.text = $"{(int)_healthBar.value}/{MaxHealth}";
     }
     
     
@@ -164,6 +168,7 @@ public class EnemyView : MonoBehaviour
     private Attack GenerateAttack(bool isImpredictable)
     {
         // choose one randomly 75% to damage, 25% to armor
+        float difficultyMultiplier = GetDifficultyMultiplier();
         int randomValue = Random.Range(0, 100);
         
         int damage = 0;
@@ -171,11 +176,13 @@ public class EnemyView : MonoBehaviour
         
         if (randomValue < 80)
         {
-            damage = Random.Range(1, 10);
+            float variation = Random.Range(0.7f, 1.3f);
+            damage = Mathf.RoundToInt(EnemyData.BaseAttack * variation * difficultyMultiplier);
         }
         else
         {
-            armor = Random.Range(1, 10);
+            float variation = Random.Range(0.7f, 1.3f);
+            armor = Mathf.RoundToInt(EnemyData.BaseArmor * variation * difficultyMultiplier);
         }
         
         // Create a new Attack object with the generated values
@@ -199,5 +206,33 @@ public class EnemyView : MonoBehaviour
         {
             //Destroy(gameObject);
         });
+    }
+    
+    private float GetDifficultyMultiplier()
+    {
+        string difficulty = "";
+        try
+        {
+            difficulty = GameManager.Instance.CurrentPlanetState.difficulty.ToString().ToLower();
+        }
+        catch (Exception _)
+        {
+        }
+
+        return difficulty switch
+        {
+            "easy" => 1.0f,
+            "medium" => 1.2f,
+            "hard" => 1.5f,
+            "boss" => 2.0f,
+            _ => GetRandomDifficultyMultiplier()
+        };
+    }
+
+    private float GetRandomDifficultyMultiplier()
+    {
+        float[] multipliers = { 1.0f, 1.2f, 1.5f, 2.0f };
+        int index = Random.Range(0, multipliers.Length);
+        return multipliers[index];
     }
 }

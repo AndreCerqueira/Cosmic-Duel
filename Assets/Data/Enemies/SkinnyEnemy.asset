@@ -24,6 +24,8 @@ MonoBehaviour:
   Name: Skinny Enemy
   Health: 8
   BaseAttack: 5
+  BaseArmor: 1
   Altura: 2
   needFlip: 1
+  IsBoss: 0
   EnemyAnimator: {fileID: 22100000, guid: d600bd292d246614ea09df1eb6bee407, type: 2}

@@ -23,7 +23,7 @@ public class StatusManager : MonoBehaviour
             DontDestroyOnLoad(gameObject); // Mantém entre cenas
         }
         
-        MaxHealth = 100; 
+        MaxHealth = 50; 
         CurrentHealth = MaxHealth;
     }
 

@@ -13,6 +13,7 @@ namespace Characters.Enemies
         [Title("Stats")]
         public int Health;
         public int BaseAttack;
+        public int BaseArmor;
         public float Altura;
         public bool needFlip;
         public bool IsBoss;
