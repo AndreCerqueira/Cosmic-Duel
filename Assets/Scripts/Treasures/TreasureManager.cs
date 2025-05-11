@@ -146,6 +146,14 @@ public class TreasureManager : Singleton<TreasureManager>
         Debug.Log("Saving remaining health");
         StatusManager.Instance.SetHealth(SelfMatchPlayer.MatchPlayer.Health);
         
+        var state = GameManager.Instance.CurrentPlanetState;
+        if (state != null)
+        {
+            state.completed = true;
+            state.hidden = false;
+        }
+        GameManager.Instance.ExitPlanet();
+        
         _closeTreasurePopupFeedback?.PlayFeedbacks();
         MatchGameOverSystem.Instance.GameOver(true);
     }

@@ -64,7 +64,7 @@ public class PlanetSpawner : MonoBehaviour
         if (gm.planets.Count > 0)
         {
             Rebuild(gm.planets);
-            fuelSystem.SetFuel(gm.currentFuel);
+            //fuelSystem.SetFuel(gm.currentFuel);
             return;
         }
 

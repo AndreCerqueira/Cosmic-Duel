@@ -4932,7 +4932,7 @@ MonoBehaviour:
         Owner: {fileID: 413392532}
         DebugActive: 0
         LoadingSceneName: MMAdditiveLoadingScreenFastFade
-        DestinationSceneName: GameScene
+        DestinationSceneName: MapScene
         LoadingMode: 2
         Priority: 4
         SecureLoad: 1
@@ -9025,7 +9025,7 @@ MonoBehaviour:
         Owner: {fileID: 1227200611}
         DebugActive: 0
         LoadingSceneName: MMAdditiveLoadingScreenFastFade
-        DestinationSceneName: GameScene
+        DestinationSceneName: MainMenu
         LoadingMode: 2
         Priority: 4
         SecureLoad: 1
@@ -9884,8 +9884,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bcfa6c1719745240849f1a14b50031c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _loseChangeScreenFeedback: {fileID: 413392532}
-  _winChangeScreenFeedback: {fileID: 1227200611}
+  _loseChangeScreenFeedback: {fileID: 1227200611}
+  _winChangeScreenFeedback: {fileID: 413392532}
 --- !u!1 &1459582754
 GameObject:
   m_ObjectHideFlags: 0

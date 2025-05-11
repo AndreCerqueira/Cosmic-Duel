@@ -11,6 +11,9 @@ public class StatusManager : MonoBehaviour
     public int MaxHealth { get; private set; }
     public int CurrentHealth { get; private set; }
     
+    public float MaxFuel { get; private set; }
+    public float CurrentFuel { get; private set; }
+    
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -25,6 +28,9 @@ public class StatusManager : MonoBehaviour
         
         MaxHealth = 50; 
         CurrentHealth = MaxHealth;
+        
+        MaxFuel = 1000f;
+        CurrentFuel = MaxFuel;
     }
 
     public void AddDamageBonus(int amount = 1)
@@ -61,5 +67,11 @@ public class StatusManager : MonoBehaviour
         MaxHealth = 100;
         CurrentHealth = MaxHealth;
         Debug.Log("Reset Status");
+    }
+    
+    public void SetFuel(float amount)
+    {
+        CurrentFuel = amount;
+        Debug.Log("Status Manager Fuel: " + CurrentFuel);
     }
 }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Project.Runtime.Scripts.General;
+using UnityEngine;
 using TMPro;
 
 [RequireComponent(typeof(Collider2D))]
@@ -60,6 +61,8 @@ public class Planet : MonoBehaviour
     {
         if (completed) { ShowBanner(); return; }
 
+        CursorManager.Instance.SetInteractCursor();
+
         hovering = true;
         if (!selected) SetAura(hoverColor);
 
@@ -71,6 +74,8 @@ public class Planet : MonoBehaviour
     {
         hovering = false;
         if (!selected) SetAura(idleColor);
+        
+        CursorManager.Instance.SetDefaultCursor();
 
         PlanetBanner.Instance.Hide();
     }
@@ -92,6 +97,7 @@ public class Planet : MonoBehaviour
 
     private void OnShipArrived()
     {
+        StatusManager.Instance.SetFuel(fuel.CurrentFuel);
         GameManager.Instance.shipPosition = transform.position;
         GameManager.Instance.EnterPlanet(PlanetIndex);
     }

@@ -12,7 +12,7 @@ public class MapInitializer : MonoBehaviour
 
         if (states.Count == 0)
         {
-            Debug.Log("[MapInit] Nenhum estado salvo — nada para repor");
+            Debug.Log("[MapInit] Nenhum estado salvo ï¿½ nada para repor");
             return;
         }
 
@@ -30,22 +30,22 @@ public class MapInitializer : MonoBehaviour
 
             GameManager.PlanetState st = states[idx];
 
-            /* posição */
+            /* posiï¿½ï¿½o */
             p.transform.position = st.position;
 
-            /* concluído? -> bloquear interação + mostrar dificuldade real */
+            /* concluï¿½do? -> bloquear interaï¿½ï¿½o + mostrar dificuldade real */
             if (st.completed)
             {
-                p.MarkCompleted();            // já faz HideDifficultyIcon()
+                p.MarkCompleted();            // jï¿½ faz HideDifficultyIcon()
             }
             else
             {
-                // garante que flag hidden coincide (para ícone ? ou não)
+                // garante que flag hidden coincide (para ï¿½cone ? ou nï¿½o)
                 p.hidden = st.hidden;
             }
         }
 
-        /* ---------- combustível ---------- */
-        fuelSystem.SetFuel(gm.currentFuel);
+        /* ---------- combustï¿½vel ---------- */
+        //fuelSystem.SetFuel(gm.currentFuel);
     }
 }

@@ -1698,7 +1698,7 @@ MonoBehaviour:
         Owner: {fileID: 263644133}
         DebugActive: 0
         LoadingSceneName: MMAdditiveLoadingScreenFastFade
-        DestinationSceneName: GameScene
+        DestinationSceneName: MapScene
         LoadingMode: 2
         Priority: 4
         SecureLoad: 1

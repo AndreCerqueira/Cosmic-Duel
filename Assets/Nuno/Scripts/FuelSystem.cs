@@ -23,11 +23,12 @@ public class FuelSystem : MonoBehaviour
     public float CurrentFuel { get; private set; }
 
     /* ---------- lifecycle ---------- */
-    private void Awake()
+    private void Start()
     {
-        CurrentFuel = maxFuel;
+        Debug.Log("Status Manager Get Fuel System: " + StatusManager.Instance.CurrentFuel);
+        CurrentFuel = StatusManager.Instance.CurrentFuel;
         fuelSlider.minValue = 0f;
-        fuelSlider.maxValue = maxFuel;
+        fuelSlider.maxValue = StatusManager.Instance.MaxFuel;
 
         RefreshUI();          // ⬅️ função que põe slider + texto em sincronia
     }
