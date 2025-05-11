@@ -2,16 +2,25 @@ using UnityEngine;
 
 public class MapInitializer : MonoBehaviour
 {
-    [SerializeField] public FuelSystem fuelSystem;   // arrasta o FuelSystem da cena
+    [SerializeField] private FuelSystem fuelSystem;
+    [SerializeField] private ShipMover ship;
 
     private void Start()
     {
         GameManager gm = GameManager.Instance;
-        var states = gm.planets;                  // lista persistente
+        var states = gm.planets;          // lista persistente
 
-        if (states.Count == 0) return;                // nada a restaurar
+        if (states.Count == 0)
+        {
+            Debug.Log("[MapInit] Nenhum estado salvo — nada para repor");
+            return;
+        }
 
-        // obtém todos os planetas já existentes na cena
+        /* ---------- nave ---------- */
+        ship.transform.position = gm.shipPosition;
+        Debug.Log($"[MapInit] Nave movida para {gm.shipPosition}");
+
+        /* ---------- planetas na cena ---------- */
         Planet[] planetsInScene = FindObjectsOfType<Planet>();
 
         foreach (Planet p in planetsInScene)
@@ -19,20 +28,24 @@ public class MapInitializer : MonoBehaviour
             int idx = p.PlanetIndex;
             if (idx < 0 || idx >= states.Count) continue;
 
-            var st = states[idx];
+            GameManager.PlanetState st = states[idx];
 
-            // reposiciona
+            /* posição */
             p.transform.position = st.position;
 
-            // esconde ícone se já concluído
+            /* concluído? -> bloquear interação + mostrar dificuldade real */
             if (st.completed)
             {
-                p.MarkCompleted();
-                p.HideDifficultyIcon();
+                p.MarkCompleted();            // já faz HideDifficultyIcon()
+            }
+            else
+            {
+                // garante que flag hidden coincide (para ícone ? ou não)
+                p.hidden = st.hidden;
             }
         }
 
-        // repõe combustível no slider
+        /* ---------- combustível ---------- */
         fuelSystem.SetFuel(gm.currentFuel);
     }
 }

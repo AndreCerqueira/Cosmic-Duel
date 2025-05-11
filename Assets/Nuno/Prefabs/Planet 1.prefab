@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 932741400456050513}
   - component: {fileID: 3680004902630636210}
   - component: {fileID: 2456562767657340158}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Planet 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32,8 +32,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -171, y: 72, z: -8}
-  m_LocalScale: {x: 5, y: 5, z: 0}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 7, y: 7, z: 0}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3556293936393603543}
   - {fileID: 181510064559842257}
@@ -106,8 +106,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f00346d15399e34ba45baf09fed9dc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeedMin: -30
-  rotationSpeedMax: 10
   amplitudeXRange: {x: 0.1, y: 0.3}
   amplitudeYRange: {x: 0.1, y: 0.3}
   amplitudeZRange: {x: 0, y: 0.1}
@@ -164,25 +162,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ship: {fileID: 0}
   line: {fileID: 0}
-  costLabel: {fileID: 0}
   fuel: {fileID: 0}
-  fuelCostLabel: {fileID: 0}
-  auraColorProperty: _OutlineColor
+  popupPrefab: {fileID: 6811939223523951005, guid: 61348d5d728f56f4baa852c006e65890, type: 3}
+  popupOffset: {x: 1.6, y: 1.2, z: 0}
+  diffSpriteNames:
+  - easy
+  - medium
+  - hard
+  - boss
+  unknownSprite: unknown
   hoverColor: {r: 1, g: 1, b: 1, a: 1}
   selectedColor: {r: 0, g: 1, b: 0, a: 1}
   idleColor: {r: 1, g: 1, b: 1, a: 0}
   costPerUnit: 10
-  dashLength: 0.25
-  fuelLabelColor: {r: 1, g: 0, b: 0, a: 1}
-  difficultyIconRenderer: {fileID: 9089382007158833459}
-  mysterySprite: {fileID: 21300000, guid: 0e6177fe2ea6d1948bfa36c63e40fbca, type: 3}
-  difficultySprites:
-  - {fileID: 21300000, guid: ef9c49bf4e9e4fb448800b0456604573, type: 3}
-  - {fileID: 21300000, guid: e23993e3699d8af4ea7c9964e045ff62, type: 3}
-  - {fileID: 21300000, guid: 2e4aac9b4751f0545b227f6b85920f8b, type: 3}
-  - {fileID: 21300000, guid: db248382561592e44a091e9556deb3b1, type: 3}
-  difficultyIconOffset: {x: 0, y: 0, z: 0}
-  sortingOrderBoost: 2
+  difficulty: 0
+  hidden: 0
 --- !u!114 &3680004902630636210
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -285,7 +279,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7956135809127192316}
   - component: {fileID: 2919511554089674921}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: POINTER_EXIT_FEEDBACK
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -496,8 +490,8 @@ MonoBehaviour:
         Mode: 0
         AnimateScaleTarget: {fileID: 8213502021734476284}
         AnimateScaleDuration: 0.2
-        RemapCurveZero: 5.5
-        RemapCurveOne: 5
+        RemapCurveZero: 7.5
+        RemapCurveOne: 7
         Offset: 0
         AnimateX: 1
         AnimateScaleTweenX:
@@ -653,7 +647,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 181510064559842257}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: DifficultyIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -686,7 +680,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8970087568313588279}
   - component: {fileID: 9115108110522330156}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: CLICK_FEEDBACK
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -957,7 +951,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4357153278635571772}
   - component: {fileID: 7870343861620614682}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: POINTER_ENTER_FEEDBACK
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1168,8 +1162,8 @@ MonoBehaviour:
         Mode: 0
         AnimateScaleTarget: {fileID: 8213502021734476284}
         AnimateScaleDuration: 0.2
-        RemapCurveZero: 5
-        RemapCurveOne: 5.5
+        RemapCurveZero: 7
+        RemapCurveOne: 7.5
         Offset: 0
         AnimateX: 1
         AnimateScaleTweenX:
@@ -1326,7 +1320,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9007647461532168733}
   - component: {fileID: 9089382007158833459}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: SpriteRenderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1412,7 +1406,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3556293936393603543}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Feedbacks
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -14,15 +14,30 @@ public class GameManager : MonoBehaviour
     [SerializeField] private MMF_Player _changeToPlanetSceneFeedback;
     [SerializeField] private MMF_Player _changeToMapSceneFeedback;
 
+    public Vector3 shipPosition;   // posição do Ship no mapa
+
+    [System.Serializable]
+    public class SpaceObjectState
+    {
+        public Vector3 position;
+        public int spriteIndex;
+    }
+
+    public List<SpaceObjectState> spaceObjects = new();
+
+
+
     /* --------- dados persistentes --------- */
     [System.Serializable]
     public class PlanetState
     {
         public Vector3 position;
-        public int difficulty;
-        public bool mystery;
+        public Planet.Difficulty difficulty;
+        public bool hidden;
         public bool completed;
+        public int spriteIndex;
     }
+
 
     public List<PlanetState> planets = new();  // preenchido pelo spawner
     public float currentFuel = 1000f;          // valor inicial
@@ -42,14 +57,18 @@ public class GameManager : MonoBehaviour
     /* --------- mudanças de cena --------- */
     public void EnterPlanet(int index)
     {
+        Debug.Log($"[GM] Entrar no planeta {index}");
         CurrentPlanetIndex = index;
         _changeToPlanetSceneFeedback?.PlayFeedbacks();
     }
 
     public void ExitPlanet()
     {
+        Debug.Log($"[GM] Sair do planeta {CurrentPlanetIndex} — marcar concluído");
         if (CurrentPlanetState != null)
             CurrentPlanetState.completed = true;
+
+        shipPosition = CurrentPlanetState.position;
 
         _changeToMapSceneFeedback?.PlayFeedbacks();
     }

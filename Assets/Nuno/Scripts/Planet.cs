@@ -1,101 +1,78 @@
 ﻿using UnityEngine;
 using TMPro;
-using System.Collections.Generic;
 
 [RequireComponent(typeof(Collider2D))]
 public class Planet : MonoBehaviour
 {
-    /* ---------- Inspector ---------- */
+    /* ───────── Enums & dados externos ───────── */
+    public enum Difficulty { Easy, Medium, Hard, Boss }
+
     [Header("Referências externas")]
     [SerializeField] private ShipMover ship;
     [SerializeField] private LineRenderer line;
-    [SerializeField] private TextMeshPro costLabel;
     [SerializeField] private FuelSystem fuel;
-    [SerializeField] private TextMeshPro fuelCostLabel;
 
-    [Header("Shader property")]
-    [SerializeField] private string auraColorProperty = "_OutlineColor";
+    [Header("Popup")]
+    [SerializeField] private PlanetPopup popupPrefab;   // arrasta o prefab
+    [SerializeField] private Vector3 popupOffset = new(1.6f, 1.2f, 0f);
 
-    [Header("Cores")]
+    public void SetPopupPrefab(PlanetPopup prefab) => popupPrefab = prefab;
+
+
+    [Header("Dificuldade Ícones")]
+    [SerializeField] private string[] diffSpriteNames = { "easy", "medium", "hard", "boss" };
+    [SerializeField] private string unknownSprite = "unknown";
+
+    private PlanetPopup popupInst;
+
+    [Header("Shader Outline")]
     [SerializeField] private Color hoverColor = Color.white;
     [SerializeField] private Color selectedColor = Color.green;
-    [SerializeField] private Color idleColor = new Color(1, 1, 1, 0);
-
-    [Header("Economia")]
-    [SerializeField] private float costPerUnit = 10f;
-    [SerializeField] private float dashLength = 0.25f;
-
-    [Header("UI do custo de combustível")]
-    [SerializeField] private Color fuelLabelColor = Color.red;
-
-    /* ---------- Icons ---------- */
-    [Header("Dificuldade")]
-    [SerializeField] private SpriteRenderer difficultyIconRenderer; // filho DifficultyIcon
-    [SerializeField] private Sprite mysterySprite;
-    [SerializeField] private List<Sprite> difficultySprites;      // index 0→diff1 … 4→diff5
-    [SerializeField] private Vector3 difficultyIconOffset = new Vector3(1f, 0f, 0f); // ajuste vertical
-    [SerializeField] private int sortingOrderBoost = 2;
-
-    private int difficulty;   // 1-5
-    private bool isMystery;    // true → mostra ?
-
-    /* ---------- estado ---------- */
-    private bool hovering;
-    private bool selected;
-    private bool isInitialized;
-    public int PlanetIndex { get; set; }
-
-    private bool completed;
-
-
-
-
+    [SerializeField] private Color idleColor = new(1, 1, 1, 0);
     private Material auraMat;
-    private static Planet currentTarget;
     private static readonly int AURA_ID = Shader.PropertyToID("_OutlineColor");
+    private static readonly int THICKNESS = Shader.PropertyToID("_OutlineThickness");
 
-    /* ---------- cache de texto ---------- */
-    private string cachedCostText = "";
-    private string cachedFuelText = "";
+    [Header("Custos")]
+    [SerializeField] private float costPerUnit = 10f;   // créditos por unidade
 
-    /* ---------- SETUP ---------- */
+    /* ───────── estado ───────── */
+    public int PlanetIndex { get; set; }
+    public Difficulty difficulty;
+    public bool hidden;
+
+    public string PlanetName { get; private set; } = "Planet-X";   // valor default
+    public void SetName(string n) => PlanetName = n;
+
+    private Vector3 popupLocalOffset;
+
+    private bool hovering, selected, completed, initialised;
+
     private void Awake()
     {
         auraMat = GetComponent<SpriteRenderer>().material;
         SetAura(idleColor);
 
-        if (difficultyIconRenderer != null)
-        {
-            // 1) volta a ser filho para seguir posição
-            difficultyIconRenderer.transform.SetParent(transform, false);
-
-            // 2) centra-se exactamente sobre o planeta
-            difficultyIconRenderer.transform.localPosition = Vector3.zero;
-
-            // 3) reduz tamanho
-            difficultyIconRenderer.transform.localScale = Vector3.one * 0.6f;
-
-            // 4) mantém na vertical mesmo que o planeta rode
-            difficultyIconRenderer.transform.rotation = Quaternion.identity;
-
-            // 5) garante que fica à frente do sprite do planeta
-            int baseOrder = GetComponent<SpriteRenderer>().sortingOrder;
-            difficultyIconRenderer.sortingOrder = baseOrder + sortingOrderBoost;
-        }
+        /* calcula o deslocamento: canto sup-dir + pequeno “margem” */
+        var sr = GetComponent<SpriteRenderer>();
+        float margin = 0.15f;                       // afasta um pouco (unidades)
+        popupLocalOffset = new Vector3(sr.bounds.extents.x + margin,
+                                       sr.bounds.extents.y + margin,
+                                       0f);
     }
 
-    /* ---------- EVENTOS DE RATO ---------- */
+    /* ───────── Hover ───────── */
     private void OnMouseEnter()
     {
         if (completed) return;
         hovering = true;
         if (!selected) SetAura(hoverColor);
 
-        line.enabled = true;
-        costLabel.gameObject.SetActive(true);
-        fuelCostLabel.gameObject.SetActive(true);
+        if (popupInst == null)
+            popupInst = Instantiate(popupPrefab, transform, false);
 
-        RefreshInfo();                 // <-- calcula só uma vez
+        popupInst.gameObject.SetActive(true);
+        RefreshPopup();
     }
 
     private void OnMouseExit()
@@ -103,155 +80,89 @@ public class Planet : MonoBehaviour
         hovering = false;
         if (!selected) SetAura(idleColor);
 
-        line.enabled = false;
-        costLabel.gameObject.SetActive(false);
-        fuelCostLabel.gameObject.SetActive(false);
+        if (popupInst != null)
+            popupInst.gameObject.SetActive(false);
     }
 
+    /* ───────── Clique / movimento ───────── */
     private void OnMouseDown()
     {
         if (completed) return;
 
-        float distance = Vector3.Distance(transform.position, ship.transform.position);
+        float dist = Vector3.Distance(transform.position, ship.transform.position);
+        if (!fuel.TryConsumeForDistance(dist)) return;
 
-        if (!fuel.TryConsumeForDistance(distance)) return;
-
-        if (currentTarget != null && currentTarget != this)
-            currentTarget.Deselect();
-
-        currentTarget = this;
-        selected = true;
-        SetAura(selectedColor);
-
+        GameManager.Instance.shipPosition = ship.transform.position;
         ship.MoveTo(transform.position, OnShipArrived);
 
-        //GameManager.Instance.EnterPlanet(PlanetIndex);
-
-        //RefreshInfo();                 // recalcula se quiseres valor exacto após clique
+        selected = true;
+        SetAura(selectedColor);
     }
 
-    /* ---------- chegada da nave ---------- */
     private void OnShipArrived()
     {
+        GameManager.Instance.shipPosition = transform.position;
         GameManager.Instance.EnterPlanet(PlanetIndex);
     }
 
-    /* ---------- chamado pelo MapInitializer depois de concluído ---------- */
+    /* ───────── Loop (actualiza popup) ───────── */
+    private void Update()
+    {
+        if (!hovering || !initialised || popupInst == null || !popupInst.gameObject.activeSelf)
+            return;
+
+        RefreshPopup();
+    }
+
+    private void RefreshPopup()
+    {
+        Vector3 shipPos = ship.transform.position;
+        float dist = Vector3.Distance(shipPos, transform.position);
+        float fuelN = dist * fuel.FuelPerUnit;
+
+        string distText = $"{dist:0} u";
+        string fuelText = $"-{fuelN:0} C";
+
+        string spriteName = hidden ? unknownSprite : diffSpriteNames[(int)difficulty];
+        string diffName = hidden ? "unknown" : difficulty.ToString();
+
+        popupInst.SetData(PlanetName, distText, fuelText, spriteName, diffName);
+
+        popupInst.transform.localPosition = popupLocalOffset;
+        popupInst.transform.localRotation = Quaternion.identity;
+
+    }
+
+    /* ───────── Concluir planeta ───────── */
     public void MarkCompleted()
     {
         completed = true;
-        HideDifficultyIcon();              // ícone some
-        GetComponent<Collider2D>().enabled = false;   // ❸ bloqueia click/hover
+        hidden = false;                           // revela dificuldade
+        GetComponent<Collider2D>().enabled = false;  // bloqueia novas interacções
+
+        if (popupInst != null) popupInst.gameObject.SetActive(false);
+
+        var st = GameManager.Instance.planets[PlanetIndex];
+        st.completed = true;
+        st.hidden = false;
     }
 
-    /* ---------- LOOP ---------- */
-    private void Update()
+    /* ───────── Helpers ───────── */
+    private void SetAura(Color c)
     {
-        if (!hovering || !isInitialized) return;
-
-        Vector3 shipPos = ship.transform.position;
-        Vector3 planetPos = transform.position;
-
-        // Actualiza apenas posições da UI e linha
-        fuelCostLabel.transform.position = shipPos + Vector3.up * 1f;
-        costLabel.transform.position = planetPos + Vector3.down * 20f;
-
-
-        /* --- reposiciona o ícone sem rotação --- *//*
-        if (difficultyIconRenderer != null)
-        {
-            difficultyIconRenderer.transform.position = planetPos + difficultyIconOffset;
-            difficultyIconRenderer.transform.rotation = Quaternion.identity; // mantém na vertical
-        }
-        */
-        float distReal = Vector3.Distance(shipPos, planetPos);
-        UpdateLine(shipPos, planetPos, distReal);
+        auraMat.SetColor(AURA_ID, c);
+        auraMat.SetFloat(THICKNESS, c.a < 0.01f ? 0f : 1f);
     }
 
-    private void LateUpdate()
-    {
-        // garante que o ícone fica sempre na vertical
-        if (difficultyIconRenderer != null)
-            difficultyIconRenderer.transform.rotation = Quaternion.identity;
-    }
-
-    /* ---------- cálculo pontual ---------- */
-    private void RefreshInfo()
-    {
-        Vector3 shipPos = ship.transform.position;
-        Vector3 planetPos = transform.position;
-        float dist = Vector3.Distance(shipPos, planetPos);
-
-        // custo em créditos
-        float cost = dist * costPerUnit;
-        cachedCostText = $"{cost:0} ×10¹² km";
-        costLabel.text = cachedCostText;
-
-        // combustível
-        float fuelNeeded = dist * fuel.FuelPerUnit;
-        float percentSpend = fuelNeeded / fuel.MaxFuel * 100f;
-        int percInt = Mathf.CeilToInt(percentSpend);
-        cachedFuelText = $"-{percInt} <voffset=0.9em><sprite name=fuel></voffset>";
-        fuelCostLabel.text = cachedFuelText;
-    }
-
-    /* ---------- HELPERS ---------- */
-    private void Deselect()
-    {
-        selected = false;
-        SetAura(hovering ? hoverColor : idleColor);
-    }
-
-    private void SetAura(Color c) => auraMat.SetColor(AURA_ID, c);
-
-    private void UpdateLine(Vector3 a, Vector3 b, float dist)
-    {
-        line.positionCount = 2;
-        line.SetPosition(0, a);
-        line.SetPosition(1, b);
-
-        line.textureMode = LineTextureMode.Tile;
-        line.material.mainTextureScale = new Vector2(dist / dashLength, 1f);
-    }
-
-    private void UpdateDifficultyIcon()
-    {
-        if (difficultyIconRenderer == null) return;
-
-        if (isMystery)
-        {
-            difficultyIconRenderer.sprite = mysterySprite;
-        }
-        else
-        {
-            int index = Mathf.Clamp(difficulty - 1, 0, difficultySprites.Count - 1);
-            difficultyIconRenderer.sprite = difficultySprites[index];
-        }
-    }
-
-    public void HideDifficultyIcon()
-    {
-        if (difficultyIconRenderer != null)
-            difficultyIconRenderer.enabled = false;
-    }
-
-
-    /* ---------- API usado pelo Spawner ---------- */
-    public void Setup(ShipMover s, LineRenderer l, TextMeshPro label,
-                      FuelSystem f, TextMeshPro fuelCostLabel, int diff, bool mystery)
+    /* ───────── Setup pelo spawner ───────── */
+    public void Setup(ShipMover s, LineRenderer l, FuelSystem f,
+                      Difficulty diff, bool hidden)
     {
         ship = s;
         line = l;
-        costLabel = label;
         fuel = f;
-        this.fuelCostLabel = fuelCostLabel;
-        this.fuelCostLabel.color = fuelLabelColor;
-
-        difficulty = Mathf.Clamp(diff, 1, 5);
-        isMystery = mystery;
-
-        UpdateDifficultyIcon();
-
-        isInitialized = true;
+        difficulty = diff;
+        this.hidden = hidden;
+        initialised = true;
     }
 }

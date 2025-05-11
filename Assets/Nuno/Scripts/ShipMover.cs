@@ -15,9 +15,21 @@ public class ShipMover : MonoBehaviour
     private Coroutine currentMove;
     private Action onArrive;
 
+    private void Awake()
+    {
+        if (FindObjectsByType<ShipMover>(FindObjectsSortMode.None).Length > 1)
+        {
+            Destroy(gameObject);           // já existe uma nave viva
+            return;
+        }
+
+        DontDestroyOnLoad(gameObject);     // esta permanece entre cenas
+    }
+
     /* ---------- API ---------- */
     public void MoveTo(Vector3 destination, Action arriveCallback)
     {
+        Debug.Log($"[ShipMover] pedido de deslocação para {destination}");
         onArrive = arriveCallback;
 
         if (currentMove != null) StopCoroutine(currentMove);
@@ -37,8 +49,11 @@ public class ShipMover : MonoBehaviour
             yield return null;
         }
 
-        transform.position = target;   // ❷ garante posição exacta
-        onArrive?.Invoke();            // ❸ avisa quem chamou
+        transform.position = target;              // <-- snap exacto (X,Y,Z)
+        Debug.Log($"[ShipMover] CHEGOU — posição final = {transform.position}");
+        GameManager.Instance.shipPosition = target;   // grava o ponto final
+        Debug.Log($"[ShipMover] shipPosition guardado no GM = {target}");
+        onArrive?.Invoke();         // ❸ avisa quem chamou
 
     }
 
@@ -54,10 +69,10 @@ public class ShipMover : MonoBehaviour
         float t = Mathf.Clamp01(distance / refDist);
 
         // LINEAR:  speed = min + t*(max-min)
-        return Mathf.Lerp(minSpeed, maxSpeed, t);
+        //return Mathf.Lerp(minSpeed, maxSpeed, t);
 
         // Quer curva exponencial? troca por:
-        // return Mathf.Lerp(minSpeed, maxSpeed, t * t);      // acelera mais devagar no início
+        return Mathf.Lerp(minSpeed, maxSpeed, t * t);      // acelera mais devagar no início
     }
 
     private float GetCameraDiagonal()
