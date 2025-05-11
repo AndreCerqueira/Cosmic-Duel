@@ -8,6 +8,10 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
+    public event System.Action PlanetCompleted;
+
+    public void NotifyPlanetCompleted() => PlanetCompleted?.Invoke();
+
     [Header("Nomes das cenas")]
     [SerializeField] private string mapScene = "MapScene";
     [SerializeField] private string planetScene = "PlanetScene";
@@ -72,6 +76,8 @@ public class GameManager : MonoBehaviour
         shipPosition = CurrentPlanetState.position;
 
         _changeToMapSceneFeedback?.PlayFeedbacks();
+
+
     }
 
     public bool IsAnyPlanetReachable(Vector3 shipPos,

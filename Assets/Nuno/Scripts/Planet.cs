@@ -74,7 +74,7 @@ public class Planet : MonoBehaviour
     {
         hovering = false;
         if (!selected) SetAura(idleColor);
-        
+
         CursorManager.Instance.SetDefaultCursor();
 
         PlanetBanner.Instance.Hide();
@@ -168,6 +168,9 @@ public class Planet : MonoBehaviour
         var st = GameManager.Instance.planets[PlanetIndex];
         st.completed = true;
         st.hidden = false;
+
+        GameManager.Instance.NotifyPlanetCompleted();
+
     }
 
     /* ───────── Helpers ───────── */

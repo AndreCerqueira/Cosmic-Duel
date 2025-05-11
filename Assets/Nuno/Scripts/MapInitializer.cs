@@ -46,6 +46,9 @@ public class MapInitializer : MonoBehaviour
                 // garante que flag hidden coincide (para �cone ? ou n�o)
                 p.hidden = st.hidden;
             }
+
+
+
         }
         FuelSystem fs = fuelSystem;  // ref local só p/ legibilidade
 
@@ -65,5 +68,10 @@ public class MapInitializer : MonoBehaviour
         }
         /* ---------- combust�vel ---------- */
         //fuelSystem.SetFuel(gm.currentFuel);
+
+        FindObjectOfType<PlanetProgressBar>()?.SendMessage("Refresh");
+
+        //GameManager.Instance.NotifyPlanetCompleted();
+
     }
 }

@@ -29,8 +29,8 @@ public class PlanetSpawner : MonoBehaviour
     [SerializeField] private FuelSystem fuelSystem;
 
     [Header("Probabilidades")]
-    [SerializeField] private float bossChance = 0.15f;  // 15 %
-    [SerializeField] private float hiddenChance = 0.25f;  // 25 %
+    [SerializeField] private float bossChance = 0.15f;
+    [SerializeField] private float hiddenChance = 0.25f;
 
     [Header("LayerMask Blocking")]
     [SerializeField] private LayerMask blockingMask;
@@ -38,12 +38,14 @@ public class PlanetSpawner : MonoBehaviour
     /* ---------- limites ---------- */
     private float minX, maxX, minY, maxY;
 
+    /* ---------- pool de sprites ---------- */
+    private readonly List<int> spritePool = new();   // guarda índices
+
     /* ---------- Awake ---------- */
     private void Awake()
     {
         if (!targetCamera) targetCamera = Camera.main;
-        if (!targetCamera || !targetCamera.orthographic)
-        { enabled = false; return; }
+        if (!targetCamera || !targetCamera.orthographic) { enabled = false; return; }
 
         float h = targetCamera.orthographicSize;
         float w = h * targetCamera.aspect;
@@ -60,36 +62,48 @@ public class PlanetSpawner : MonoBehaviour
 
         var gm = GameManager.Instance;
 
-        /* A) – já existe estado */
+        /* A) já existe estado salvo */
         if (gm.planets.Count > 0)
         {
             Rebuild(gm.planets);
-            //fuelSystem.SetFuel(gm.currentFuel);
             return;
         }
 
-        /* B) – primeiro load */
+        /* B) primeiro load */
         if (planetSprites.Count == 0 || planetPrefab == null) return;
-
-        List<Sprite> shuffled = new(planetSprites);
-        Shuffle(shuffled);
 
         for (int i = 0; i < planetCount; i++)
         {
-            Sprite spr = shuffled[i % shuffled.Count];
-            float rad = Mathf.Max(spr.bounds.size.x, spr.bounds.size.y) * 0.5f;
-            float safety = rad + minDistance;
+            /* garante que há sprite para espreitar */
+            if (spritePool.Count == 0) RefillAndShufflePool();
 
-            if (!TryFindFree(safety, out Vector3 pos)) continue;
+            int sprIdx = spritePool[0];               // PEEK (ainda não remove)
+            Sprite spr = planetSprites[sprIdx];
+
+            float radius = Mathf.Max(spr.bounds.size.x, spr.bounds.size.y) * 0.5f;
+            float safetyR = radius + minDistance;
+
+            /* tenta até 20 vezes achar posição livre para ESTE sprite */
+            if (!TryFindFree(safetyR, out Vector3 pos))
+            {
+                Debug.LogWarning($"[PlanetSpawner] falhou posição para sprite {sprIdx}");
+                spritePool.RemoveAt(0);   // descarta este sprite e continua
+                i--;                      // não conta como planeta criado
+                continue;
+            }
+
+            /* —— posição OK → agora sim removemos do pool —— */
+            spritePool.RemoveAt(0);
 
             Planet.Difficulty diff = Random.value < bossChance
                 ? Planet.Difficulty.Boss
-                : (Planet.Difficulty)Random.Range(0, 3);   // Easy–Hard
+                : (Planet.Difficulty)Random.Range(0, 3);
 
             bool hidden = Random.value < hiddenChance;
 
-            CreateAndRegisterPlanet(pos, diff, hidden, spr, planetSprites.IndexOf(spr));
+            CreateAndRegisterPlanet(pos, diff, hidden, spr, sprIdx);
         }
+
     }
 
     /* ---------- Rebuild ---------- */
@@ -105,7 +119,22 @@ public class PlanetSpawner : MonoBehaviour
         }
     }
 
-    /* ---------- helpers ---------- */
+    /* ---------- sprite-pool helpers ---------- */
+    private void RefillAndShufflePool()
+    {
+        spritePool.Clear();
+        for (int i = 0; i < planetSprites.Count; i++) spritePool.Add(i);
+        Shuffle(spritePool);
+    }
+
+    private int GetSpriteFromPool()
+    {
+        int idx = spritePool[0];
+        spritePool.RemoveAt(0);
+        return idx;
+    }
+
+    /* ---------- create helpers ---------- */
     private bool TryFindFree(float r, out Vector3 pos)
     {
         for (int t = 0; t < 20; t++)
@@ -138,13 +167,14 @@ public class PlanetSpawner : MonoBehaviour
         gm.planets.Add(new GameManager.PlanetState
         {
             position = pos,
-            difficulty = diff,     // <-- enum, não int
+            difficulty = diff,
             hidden = hidden,
             completed = false,
             spriteIndex = sprIdx
         });
     }
 
+    /* ---------- util ---------- */
     private Vector3 RandomPoint() =>
         new(Random.Range(minX, maxX), Random.Range(minY, maxY), 0f);
 
