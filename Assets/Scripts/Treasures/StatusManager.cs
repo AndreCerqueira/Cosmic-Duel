@@ -60,6 +60,19 @@ public class StatusManager : MonoBehaviour
         Debug.Log("Regen Health: " + CurrentHealth);
     }
     
+    // REGEN Fuel
+    public void RegenFuel(float percentage)
+    {
+        float amountToRegenerate = MaxFuel * (percentage / 100f);
+    
+        CurrentFuel += amountToRegenerate;
+    
+        if (CurrentFuel > MaxFuel)
+            CurrentFuel = MaxFuel;
+
+        Debug.Log("Regen Fuel: " + CurrentFuel);
+    }
+    
     public void ResetStatus()
     {
         DamageBonus = 0;
