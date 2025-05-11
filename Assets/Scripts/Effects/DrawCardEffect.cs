@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class DrawCardEffect : EffectPlain
 {
-    public int amount;
-
     public override GameAction GetGameAction()
     {
         Debug.Log($"Draw {amount} cards.");

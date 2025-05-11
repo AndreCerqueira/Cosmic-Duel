@@ -4,5 +4,7 @@ using UnityEngine;
 [System.Serializable]
 public abstract class EffectPlain
 {
+    public int amount;
+    
     public abstract GameAction GetGameAction();
 }

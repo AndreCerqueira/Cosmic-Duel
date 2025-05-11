@@ -33,7 +33,7 @@ MonoBehaviour:
       Data: 1|DamageEffectPlain, Assembly-CSharp
     - Name: amount
       Entry: 3
-      Data: 6
+      Data: 600
     - Name: 
       Entry: 8
       Data: 
@@ -44,7 +44,7 @@ MonoBehaviour:
       Entry: 8
       Data: 
   Name: Heavy Attack
-  Description: Deal 6 damage
+  Description: Deal {0} damage
   Artwork: {fileID: 21300000, guid: 05fa8893d6d7a844d882c8c33ceef703, type: 3}
   BorderType: 2
   HaveRedDetail: 0

@@ -41,12 +41,14 @@ public class DamageSystem : Singleton<MonoBehaviour>
         if (SelectedObjectToDamage.TryGetComponent(out MatchPlayerController player))
         {
             // Deal damage to the player
-            player.DealDamage(action.Amount);
+            var bonusAmount = StatusManager.Instance.DamageBonus;
+            player.DealDamage(action.Amount + bonusAmount);
         }
         else if (SelectedObjectToDamage.TryGetComponent(out EnemyView enemy))
         {
             // Deal damage to the enemy
-            enemy.DealDamage(action.Amount);
+            var bonusAmount = StatusManager.Instance.DamageBonus;
+            enemy.DealDamage(action.Amount + bonusAmount);
         }
         else
         {
@@ -69,12 +71,14 @@ public class DamageSystem : Singleton<MonoBehaviour>
         if (SelectedObjectToDamage.TryGetComponent(out MatchPlayerController player))
         {
             // Gain armor for the player
-            player.GainArmor(action.Amount);
+            var bonusAmount = StatusManager.Instance.ArmorBonus;
+            player.GainArmor(action.Amount + bonusAmount);
         }
         else if (SelectedObjectToDamage.TryGetComponent(out EnemyView enemy))
         {
             // Gain armor for the enemy
-            enemy.GainArmor(action.Amount);
+            var bonusAmount = StatusManager.Instance.ArmorBonus;
+            enemy.GainArmor(action.Amount + bonusAmount);
         }
         else
         {

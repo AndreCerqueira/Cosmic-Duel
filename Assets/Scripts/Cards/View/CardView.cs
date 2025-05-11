@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Cards.Models;
+using Cards.View;
 using Match;
 using Project.Runtime.Scripts.Game.Matches;
 using TMPro;
@@ -57,7 +59,7 @@ namespace Cards.View
         {
             Card = card;
             _name.text = card.Name;
-            _description.text = FormatDescription(card.Description);
+            _description.text = CardDescriptionFormatter.Resolve(card, SelfMatchPlayer);// FormatDescriptionWithEffects(card.Description, card.Effects);
             
             for (int i = 0; i < _costs.Count; i++)
             {
@@ -95,16 +97,7 @@ namespace Cards.View
             }
         }
 
-        private string FormatDescription(string description)
-        {
-            var pattern = @"\{keyword:([^{}]+?)\}";
-            description = Regex.Replace(description, pattern, "<color=#DDBE78>$1</color>");
-            description = description.Replace(@"\n", "\n");
-            description = HighlightNumbers(description);
-            return description;
-        }
-
-        private string ReplaceTextIcons(string description)
+        public static string ReplaceTextIcons(string description)
         {
             // Substituir {Text-Icons/defense.png} pelo quad e carregar a textura correspondente
             description = description.Replace("{Text-Icons/defense.png}", " <sprite name=\"defense\">");
@@ -116,10 +109,59 @@ namespace Cards.View
             return description;
         }
         
-        private string HighlightNumbers(string text)
+        public static string HighlightNumbers(string text)
         {
             // Substitui números inteiros (não parte de palavras) por versão colorida
             return Regex.Replace(text, @"\b(\d+)\b", "<color=#FFA500>$1</color>");
         }
+        
+    }
+}
+
+
+public static class CardDescriptionFormatter
+{
+    /// <summary>
+    /// Substitui {0}, {1}… pelos valores dos efeitos, depois aplica
+    /// as outras formatações (keywords, icones, cor dos números, \n, …).
+    /// </summary>
+    public static string Resolve(Card card, MatchPlayer owner)
+    {
+        // 1. Constrói o array com os amounts já modificados.
+        object[] values = card.Effects
+            .Select(e => (object)(
+                e is DamageEffectPlain ? e.amount + StatusManager.Instance.DamageBonus :
+                e is GainArmorEffect ? e.amount + StatusManager.Instance.ArmorBonus :
+                e.amount
+            ))
+            .ToArray();
+
+        // 2. Faz o string.Format.  Se faltar ou sobrar placeholder,
+        //    capturamos para não explodir em runtime.
+        string raw;
+        try
+        {
+            raw = string.Format(card.Description, values);
+        }
+        catch (FormatException)
+        {
+            Debug.LogError(
+                $"Descrição «{card.Description}» não bate com " +
+                $"{card.Effects.Count} efeito(s).");
+            raw = card.Description; // devolve mesmo assim
+        }
+
+        // 3. Devolve já passado pelos teus efeitos visuais.
+        return CardViewStatic.FormatDescriptionStatic(raw);
+    }
+}
+
+public static class CardViewStatic
+{
+    public static string FormatDescriptionStatic(string description)
+    {
+        description = CardView.ReplaceTextIcons(description);
+        description = CardView.HighlightNumbers(description);
+        return description;
     }
 }

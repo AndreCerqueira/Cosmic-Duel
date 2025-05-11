@@ -53,7 +53,7 @@ MonoBehaviour:
       Entry: 8
       Data: 
   Name: Acceleration
-  Description: Draw 1 Card. \n Gain 2 Armor.
+  Description: Draw {0} Card. \n Gain {1} Armor.
   Artwork: {fileID: 21300000, guid: 8ddd52918f0ed99499aa239234ddef9a, type: 3}
   BorderType: 2
   HaveRedDetail: 0
