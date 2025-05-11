@@ -10,7 +10,7 @@ public class FuelSystem : MonoBehaviour
     [SerializeField] private float maxFuel = 1000f;
 
     [Tooltip("Litros (ou unidades) gastos por unidade de distância")]
-    [SerializeField] private float fuelPerUnit = 0.1f;   // 10 p/ 100 ⇒ 0.1
+    [SerializeField] private float fuelPerUnit = 0.5f;   // 10 p/ 100 ⇒ 0.1
 
     [Header("UI")]
     [SerializeField] private Slider fuelSlider;

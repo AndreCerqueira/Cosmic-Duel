@@ -163,8 +163,7 @@ MonoBehaviour:
   ship: {fileID: 0}
   line: {fileID: 0}
   fuel: {fileID: 0}
-  popupPrefab: {fileID: 6811939223523951005, guid: 61348d5d728f56f4baa852c006e65890, type: 3}
-  popupOffset: {x: 1.6, y: 1.2, z: 0}
+  popupPrefab: {fileID: 6228039630283308938, guid: d8a57ddd7994ebf4ba48a579d8fcca00, type: 3}
   diffSpriteNames:
   - easy
   - medium

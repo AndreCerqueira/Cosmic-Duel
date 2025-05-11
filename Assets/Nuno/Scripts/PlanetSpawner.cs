@@ -11,10 +11,6 @@ public class PlanetSpawner : MonoBehaviour
     [Header("Prefab do planeta")]
     [SerializeField] private GameObject planetPrefab;
 
-    [Header("Popup Prefab")]
-    [SerializeField] private PlanetPopup popupPrefab;
-
-
     [Header("Sprites possíveis")]
     [SerializeField] private List<Sprite> planetSprites;
 
@@ -129,7 +125,6 @@ public class PlanetSpawner : MonoBehaviour
         p.PlanetIndex = index;
         p.SetName(NamePool.GetUniqueName());
         p.Setup(ship, line, fuelSystem, diff, hidden);
-        p.SetPopupPrefab(popupPrefab);
         go.GetComponent<SpriteRenderer>().sprite = sprite;
         return p;
     }

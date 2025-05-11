@@ -12,17 +12,6 @@ public class Planet : MonoBehaviour
     [SerializeField] private LineRenderer line;
     [SerializeField] private FuelSystem fuel;
 
-    [Header("Popup")]
-    [SerializeField] private PlanetPopup popupPrefab;   // arrasta o prefab
-    [SerializeField] private Vector3 popupOffset = new(1.6f, 1.2f, 0f);
-
-    public void SetPopupPrefab(PlanetPopup prefab) => popupPrefab = prefab;
-
-
-    [Header("Dificuldade Ícones")]
-    [SerializeField] private string[] diffSpriteNames = { "easy", "medium", "hard", "boss" };
-    [SerializeField] private string unknownSprite = "unknown";
-
     private PlanetPopup popupInst;
 
     [Header("Shader Outline")]
@@ -35,6 +24,11 @@ public class Planet : MonoBehaviour
 
     [Header("Custos")]
     [SerializeField] private float costPerUnit = 10f;   // créditos por unidade
+
+    [Header("Aparência depois de concluído")]
+    [Range(0f, 1f)]
+    private float completedBrightness = 0.50f;   // 0 = preto, 1 = normal
+
 
     /* ───────── estado ───────── */
     public int PlanetIndex { get; set; }
@@ -64,15 +58,13 @@ public class Planet : MonoBehaviour
     /* ───────── Hover ───────── */
     private void OnMouseEnter()
     {
-        if (completed) return;
+        if (completed) { ShowBanner(); return; }
+
         hovering = true;
         if (!selected) SetAura(hoverColor);
 
-        if (popupInst == null)
-            popupInst = Instantiate(popupPrefab, transform, false);
+        ShowBanner();
 
-        popupInst.gameObject.SetActive(true);
-        RefreshPopup();
     }
 
     private void OnMouseExit()
@@ -80,8 +72,7 @@ public class Planet : MonoBehaviour
         hovering = false;
         if (!selected) SetAura(idleColor);
 
-        if (popupInst != null)
-            popupInst.gameObject.SetActive(false);
+        PlanetBanner.Instance.Hide();
     }
 
     /* ───────── Clique / movimento ───────── */
@@ -108,37 +99,63 @@ public class Planet : MonoBehaviour
     /* ───────── Loop (actualiza popup) ───────── */
     private void Update()
     {
-        if (!hovering || !initialised || popupInst == null || !popupInst.gameObject.activeSelf)
+        if (!hovering || !initialised)
             return;
 
-        RefreshPopup();
+        UpdateBanner();
     }
 
-    private void RefreshPopup()
+
+
+    /* ---------- primeiro preenchimento ---------- */
+    private void ShowBanner()
     {
+        FillBanner();
+        PlanetBanner.Instance.Show();
+    }
+
+    /* ---------- chamado no Update() ---------- */
+    private void UpdateBanner()
+    {
+        FillBanner();                 // apenas actualiza se não concluído
+    }
+
+    /* ---------- lógica comum ---------- */
+    private void FillBanner()
+    {
+        if (completed)
+        {
+            PlanetBanner.Instance.SetText(
+                PlanetName,
+                "0 <sprite name=\"iconsf6\"> ",               // sem distância
+                "0",               // sem combustível
+                "Concluído");
+            return;
+        }
+
         Vector3 shipPos = ship.transform.position;
         float dist = Vector3.Distance(shipPos, transform.position);
-        float fuelN = dist * fuel.FuelPerUnit;
+        float fuelUnits = dist * fuel.FuelPerUnit;
+        float fuelPercent = fuelUnits / fuel.MaxFuel * 100f;
 
-        string distText = $"{dist:0} u";
-        string fuelText = $"-{fuelN:0} C";
-
-        string spriteName = hidden ? unknownSprite : diffSpriteNames[(int)difficulty];
-        string diffName = hidden ? "unknown" : difficulty.ToString();
-
-        popupInst.SetData(PlanetName, distText, fuelText, spriteName, diffName);
-
-        popupInst.transform.localPosition = popupLocalOffset;
-        popupInst.transform.localRotation = Quaternion.identity;
-
+        PlanetBanner.Instance.SetText(
+            PlanetName,
+            FormatDistance(dist),
+            $"-{fuelPercent:0} <sprite name=\"iconsf6\">",
+            hidden ? "???" : difficulty.ToString());
     }
+
+
 
     /* ───────── Concluir planeta ───────── */
     public void MarkCompleted()
     {
         completed = true;
         hidden = false;                           // revela dificuldade
-        GetComponent<Collider2D>().enabled = false;  // bloqueia novas interacções
+
+        Color tint = Color.white * completedBrightness;   // cria cinzento uniforme
+        GetComponent<SpriteRenderer>().color = tint;
+
 
         if (popupInst != null) popupInst.gameObject.SetActive(false);
 
@@ -153,6 +170,13 @@ public class Planet : MonoBehaviour
         auraMat.SetColor(AURA_ID, c);
         auraMat.SetFloat(THICKNESS, c.a < 0.01f ? 0f : 1f);
     }
+
+    // devolve "123 ×10¹² km"   (usa sobrescrito)
+    private static string FormatDistance(float units)
+    {
+        return $"{units:0} ×10<sup>12</sup> km";
+    }
+
 
     /* ───────── Setup pelo spawner ───────── */
     public void Setup(ShipMover s, LineRenderer l, FuelSystem f,
