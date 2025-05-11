@@ -72,4 +72,25 @@ public class GameManager : MonoBehaviour
 
         _changeToMapSceneFeedback?.PlayFeedbacks();
     }
+
+    public bool IsAnyPlanetReachable(Vector3 shipPos,
+                                 float fuelLeftPercent,   // gasolina que tens em %
+                                 float fuelPerUnit,       // unidades por unidade de dist.
+                                 float maxFuel)           // depósito cheio em unidades
+    {
+        foreach (var st in planets)
+        {
+            if (st.completed) continue;
+
+            float distUnits = Vector3.Distance(shipPos, st.position);
+            float needUnits = distUnits * fuelPerUnit;
+            float needPercent = needUnits / maxFuel * 100f;
+
+            if (needPercent <= fuelLeftPercent)
+                return true;           // existe pelo menos 1 destino
+        }
+        return false;                  // nenhum planeta é alcançável
+    }
+
+
 }

@@ -5,6 +5,9 @@ public class MapInitializer : MonoBehaviour
     [SerializeField] private FuelSystem fuelSystem;
     [SerializeField] private ShipMover ship;
 
+    [Header("Perdeu o jogo")]
+    [SerializeField] private GameObject gameOverPop;
+
     private void Start()
     {
         GameManager gm = GameManager.Instance;
@@ -44,7 +47,21 @@ public class MapInitializer : MonoBehaviour
                 p.hidden = st.hidden;
             }
         }
+        FuelSystem fs = fuelSystem;  // ref local só p/ legibilidade
 
+        bool reachable = GameManager.Instance.IsAnyPlanetReachable(
+                        ship.transform.position,
+                        fs.CurrentFuel,  // % que resta
+                        fs.FuelPerUnit,
+                        fs.MaxFuel);
+
+
+        if (!reachable)
+        {
+            Debug.Log("[MapInit] nenhum planeta alcançável — GAME OVER");
+            gameOverPop.SetActive(true);      // mostra painel
+            ship.enabled = false;             // opcional: bloqueia nave
+        }
         /* ---------- combust�vel ---------- */
         //fuelSystem.SetFuel(gm.currentFuel);
     }
