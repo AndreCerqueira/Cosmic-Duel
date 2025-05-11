@@ -119,7 +119,7 @@ public class TreasureManager : Singleton<TreasureManager>
         // Logic to gain fuel bonus
         Debug.Log("Gained Fuel Bonus!");
 
-        StatusManager.Instance.RegenFuel(30);
+        StatusManager.Instance.RegenFuel(40);
 
         DoMatchEnd();
     }

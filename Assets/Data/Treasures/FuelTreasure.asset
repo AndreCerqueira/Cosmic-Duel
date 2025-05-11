@@ -13,17 +13,20 @@ MonoBehaviour:
   m_Name: FuelTreasure
   m_EditorClassIdentifier: 
   serializationData:
-    SerializedFormat: 0
-    SerializedBytes: 2d01070000004500660066006500630074007300
+    SerializedFormat: 2
+    SerializedBytes: 
     ReferencedUnityObjects: []
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
-    SerializationNodes: []
+    SerializationNodes:
+    - Name: Effects
+      Entry: 6
+      Data: 
   Id: 1
   Name: teste
-  Description: Restores 30% of your fuel.
+  Description: Restores 40% of your fuel.
   Artwork: {fileID: 21300000, guid: 5603c4a478b382e498e2204135b18998, type: 3}
   BorderType: 2
   HaveRedDetail: 0
