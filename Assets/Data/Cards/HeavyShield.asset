@@ -30,13 +30,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 7
-      Data: 1|DamageEffectPlain, Assembly-CSharp
+      Data: 1|GainArmorEffect, Assembly-CSharp
     - Name: amount
       Entry: 3
-      Data: 8
-    - Name: ToAllEnemies
-      Entry: 5
-      Data: false
+      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -46,9 +43,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  Name: Heavy Attack
-  Description: Deal {0} damage
-  Artwork: {fileID: 21300000, guid: 05fa8893d6d7a844d882c8c33ceef703, type: 3}
+  Name: Shield Up
+  Description: Gain {0} Armor
+  Artwork: {fileID: 21300000, guid: 6bdc2e82d359e6541950fc380fb2f1d8, type: 3}
   BorderType: 2
   HaveRedDetail: 0
   HaveBlueDetail: 0
