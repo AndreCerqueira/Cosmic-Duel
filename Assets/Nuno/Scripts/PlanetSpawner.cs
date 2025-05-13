@@ -16,6 +16,8 @@ public class PlanetSpawner : MonoBehaviour
 
     [Header("Quantos planetas criar")]
     [SerializeField] private int planetCount = 6;
+    
+    public int PlanetCount => planetCount;
 
     [Header("Distância mínima entre planetas")]
     [SerializeField] private float minDistance = 1f;

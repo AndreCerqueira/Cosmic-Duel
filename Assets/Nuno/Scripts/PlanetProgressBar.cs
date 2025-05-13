@@ -6,6 +6,7 @@ public class PlanetProgressBar : MonoBehaviour
 {
     [SerializeField] private Slider slider;    // arrasta o Fill Slider
     [SerializeField] private TMP_Text label;     // opcional x / total
+    [SerializeField] private PlanetSpawner planetSpawner;
 
     private void OnEnable()
     {
@@ -21,13 +22,15 @@ public class PlanetProgressBar : MonoBehaviour
     private void Refresh()
     {
         var list = GameManager.Instance.planets;
-        int total = list.Count;
+        int total = planetSpawner.PlanetCount;
         int completed = 0;
 
         foreach (var st in list)
             if (st.completed) completed++;
 
         slider.value = (float)completed / total;
+        
+        Debug.Log($"[PlanetProgressBar] {completed} / {total} ({slider.value})");
 
         if (label)
             label.text = $"{completed} / {total}";

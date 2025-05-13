@@ -25,6 +25,7 @@ public class EnemyView : MonoBehaviour
     [SerializeField] private ArmorView _armorView;
     [SerializeField] private Animator _animator;
     [SerializeField] public Transform _canvasTransform;
+    [SerializeField] public GameObject isBossTag;
     
     public Attack NextAttack { get; private set; }
     
@@ -63,6 +64,8 @@ public class EnemyView : MonoBehaviour
         _animator.runtimeAnimatorController = EnemyData.EnemyAnimator;
         
         _artwork.color = AlienColorPalette.Instance.GetRandomColor();
+        
+        isBossTag.SetActive(EnemyData.IsBoss);
 
         GenerateNextAttack();
     }

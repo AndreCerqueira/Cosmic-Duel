@@ -307,6 +307,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: efd381071d54a6a439614be24129fdb6, type: 2}
   - {fileID: 11400000, guid: a6a55ad4924e381439d1f1b7775ae3df, type: 2}
   - {fileID: 11400000, guid: e8f25b5613a446d40b237c6c3778aec6, type: 2}
+  - {fileID: 11400000, guid: 065e0bd12efb4514fa8ec110c54ed963, type: 2}
+  - {fileID: 11400000, guid: c37c5f198ec60384b9abbb31dc201dd5, type: 2}
+  - {fileID: 11400000, guid: 103abf5adfe17f143ab9dddc72a0ca4a, type: 2}
+  - {fileID: 11400000, guid: 5d4cc42e51824714b9ed76ee6289f516, type: 2}
   _enemySpawnPoints:
   - {fileID: 462043111}
   - {fileID: 1041112360}
@@ -14747,7 +14751,7 @@ Transform:
   m_GameObject: {fileID: 2047165140}
   serializedVersion: 2
   m_LocalRotation: {x: -0.46315843, y: 0.04790954, z: 0.025083767, w: 0.8846241}
-  m_LocalPosition: {x: 2.23, y: 1.13, z: 0.23}
+  m_LocalPosition: {x: 2.4, y: 1, z: 0.23}
   m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

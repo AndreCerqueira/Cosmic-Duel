@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0f740b881b1263c4dbde50f0e58bce26, type: 3}
-  m_Name: SkinnyEnemy
+  m_Name: SkinnyBoss
   m_EditorClassIdentifier: 
   serializationData:
-    SerializedFormat: 2
+    SerializedFormat: 0
     SerializedBytes: 
     ReferencedUnityObjects: []
     SerializedBytesString: 
@@ -22,10 +22,11 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   Name: Skinny Enemy
-  Health: 11
-  BaseAttack: 5
-  BaseArmor: 1
-  Altura: 2
+  Health: 18
+  BaseAttack: 6
+  BaseArmor: 3
+  Altura: 2.6
   needFlip: 1
-  IsBoss: 0
+  IsBoss: 1
+  MaxAllies: 0
   EnemyAnimator: {fileID: 22100000, guid: d600bd292d246614ea09df1eb6bee407, type: 2}

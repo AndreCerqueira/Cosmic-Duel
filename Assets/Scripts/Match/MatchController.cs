@@ -116,23 +116,42 @@ namespace Match
             float bossChance = difficulty switch
             {
                 "easy" => 0.0f,
-                "medium" => 0.2f,
-                "hard" => 0.5f,
+                "medium" => 0.0f,
+                "hard" => 0.75f,
                 "boss" => 1.0f,
-                _ => 0.1f
+                _ => 0.0f
             };
 
+            Debug.Log($"[MatchController] SpawnEnemies: {difficulty} - Boss chance: {bossChance}");
             bool spawnBoss = UnityEngine.Random.value < bossChance;
+            Debug.Log($"[MatchController] Spawn boss: {spawnBoss}");
 
             if (spawnBoss)
             {
-                var bossData = _allEnemies.FirstOrDefault(e => e.IsBoss);
+                var bossData = _allEnemies
+                    .Where(e => e.IsBoss)
+                    .OrderBy(e => UnityEngine.Random.value)
+                    .FirstOrDefault();
+
                 if (bossData != null)
                 {
                     var boss = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
                     boss.Setup(bossData);
                     boss.transform.localScale *= 2;
                     boss._canvasTransform.localScale /= 2;
+                    
+                    // get boss collider  /2, 
+                    /*
+                    var bossCollider = boss.GetComponent<BoxCollider>();
+                    if (bossCollider != null)
+                    {
+                        bossCollider.size = new Vector3(bossCollider.size.x / 2, bossCollider.size.y / 2, bossCollider.size.z /3);
+                        bossCollider.center = new Vector3(bossCollider.center.x, bossCollider.center.y / 2, bossCollider.center.z);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Boss collider not found.");
+                    }*/
 
                     boss.OnEnemyDeath += () =>
                     {
@@ -145,7 +164,38 @@ namespace Match
                     };
 
                     selectedEnemies.Add(boss);
-                    return selectedEnemies; // Boss ocupa o combate inteiro
+
+                    int allyCount = bossData.MaxAllies; // Número de aliados baseado no valor do int
+
+                    if (allyCount > 0)
+                    {
+                        var cEnemies = _allEnemies.Where(e => !e.IsBoss).ToList();
+
+                        // Número máximo de aliados = nº total de spawn points - 1 (o boss já ocupa um)
+                        int maxAllies = Mathf.Min(allyCount, _enemySpawnPoints.Count - 1); // Garante que não ultrapassa o número de spawn points disponíveis
+                        int allyCountToSpawn = maxAllies;//UnityEngine.Random.Range(1, maxAllies + 1);
+
+                        for (int i = 0; i < allyCountToSpawn && selectedEnemies.Count < _enemySpawnPoints.Count; i++)
+                        {
+                            var enemyData = cEnemies[UnityEngine.Random.Range(0, cEnemies.Count)];
+                            var enemy = Instantiate(_enemyBotPrefab, _playerPrefabContainer).GetComponent<EnemyView>();
+                            enemy.Setup(enemyData);
+
+                            enemy.OnEnemyDeath += () =>
+                            {
+                                if (selectedEnemies.All(e => e.IsDead))
+                                {
+                                    _VictoryPopup.gameObject.SetActive(true);
+                                    RemoveHandView();
+                                    Debug.Log("You Win");
+                                }
+                            };
+
+                            selectedEnemies.Add(enemy);
+                        }
+                    }
+
+                    return selectedEnemies;
                 }
             }
 

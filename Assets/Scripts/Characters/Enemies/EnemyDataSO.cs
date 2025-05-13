@@ -17,6 +17,7 @@ namespace Characters.Enemies
         public float Altura;
         public bool needFlip;
         public bool IsBoss;
+        public int MaxAllies;
         
         public AnimatorOverrideController EnemyAnimator;
     }

@@ -26,7 +26,7 @@ MonoBehaviour:
       Data: 
   Id: 0
   Name: teste
-  Description: Restores 10% of your health.
+  Description: Restores 15% of your health.
   Artwork: {fileID: 21300000, guid: 9a4373f64a74d4244a7449787a6f20d1, type: 3}
   BorderType: 2
   HaveRedDetail: 0

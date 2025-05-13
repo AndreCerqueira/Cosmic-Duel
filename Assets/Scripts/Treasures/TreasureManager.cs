@@ -108,7 +108,7 @@ public class TreasureManager : Singleton<TreasureManager>
         Debug.Log("Gained Health Bonus!");
 
         StatusManager.Instance.SetHealth(SelfMatchPlayer.MatchPlayer.Health);
-        StatusManager.Instance.RegenHealth(10);
+        StatusManager.Instance.RegenHealth(15);
         SelfMatchPlayer.MatchPlayer.Health = StatusManager.Instance.CurrentHealth;
 
         DoMatchEnd();

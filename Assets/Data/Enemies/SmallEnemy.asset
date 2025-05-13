@@ -23,7 +23,7 @@ MonoBehaviour:
     SerializationNodes: []
   Name: Small Enemy
   Health: 4
-  BaseAttack: 4
+  BaseAttack: 6
   BaseArmor: 4
   Altura: 0
   needFlip: 0

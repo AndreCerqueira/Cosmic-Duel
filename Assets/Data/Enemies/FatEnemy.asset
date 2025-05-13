@@ -22,7 +22,7 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   Name: Fat Enemy
-  Health: 15
+  Health: 16
   BaseAttack: 2
   BaseArmor: 5
   Altura: 1

@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private MMF_Player _changeToPlanetSceneFeedback;
     [SerializeField] private MMF_Player _changeToMapSceneFeedback;
 
-    public Vector3 shipPosition;   // posição do Ship no mapa
+    public Vector3 shipPosition;   // posiï¿½ï¿½o do Ship no mapa
 
     [System.Serializable]
     public class SpaceObjectState
@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour
         else { Destroy(gameObject); }
     }
 
-    /* --------- mudanças de cena --------- */
+    /* --------- mudanï¿½as de cena --------- */
     public void EnterPlanet(int index)
     {
         Debug.Log($"[GM] Entrar no planeta {index}");
@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviour
 
     public void ExitPlanet()
     {
-        Debug.Log($"[GM] Sair do planeta {CurrentPlanetIndex} — marcar concluído");
+        Debug.Log($"[GM] Sair do planeta {CurrentPlanetIndex} ï¿½ marcar concluï¿½do");
         if (CurrentPlanetState != null)
             CurrentPlanetState.completed = true;
 
@@ -83,7 +83,7 @@ public class GameManager : MonoBehaviour
     public bool IsAnyPlanetReachable(Vector3 shipPos,
                                  float fuelLeftPercent,   // gasolina que tens em %
                                  float fuelPerUnit,       // unidades por unidade de dist.
-                                 float maxFuel)           // depósito cheio em unidades
+                                 float maxFuel)           // depï¿½sito cheio em unidades
     {
         foreach (var st in planets)
         {
@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour
             if (needPercent <= fuelLeftPercent)
                 return true;           // existe pelo menos 1 destino
         }
-        return false;                  // nenhum planeta é alcançável
+        return false;                  // nenhum planeta ï¿½ alcanï¿½ï¿½vel
     }
 
     internal void ResetGame()
@@ -110,5 +110,14 @@ public class GameManager : MonoBehaviour
         CurrentPlanetIndex = -1;
         shipPosition = Vector3.zero;   // reposicionar nave no mapa
 
+    }
+    
+    public bool AllPlanetsCompleted()
+    {
+        foreach (var st in planets)
+        {
+            if (!st.completed) return false;
+        }
+        return true;
     }
 }

@@ -7,6 +7,7 @@ public class MapInitializer : MonoBehaviour
 
     [Header("Perdeu o jogo")]
     [SerializeField] private GameObject gameOverPop;
+    [SerializeField] private GameObject winPop;
 
     private void Start()
     {
@@ -62,6 +63,16 @@ public class MapInitializer : MonoBehaviour
 
         if (!reachable)
         {
+            // if is not reachable, but the player has completed all planets
+            // then show the win pop up
+            if (GameManager.Instance.AllPlanetsCompleted())
+            {
+                Debug.Log("[MapInit] todos os planetas concluídos — VITÓRIA");
+                winPop.SetActive(true);         // mostra painel
+                ship.enabled = false;          // opcional: bloqueia nave
+                return;
+            }
+            
             Debug.Log("[MapInit] nenhum planeta alcançável — GAME OVER");
             gameOverPop.SetActive(true);      // mostra painel
             ship.enabled = false;             // opcional: bloqueia nave

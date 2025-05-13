@@ -21,11 +21,12 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  Name: Creepy Enemy
-  Health: 25
-  BaseAttack: 7
-  BaseArmor: 6
-  Altura: 1.3
+  Name: Creepy Boss
+  Health: 8
+  BaseAttack: 3
+  BaseArmor: 3
+  Altura: 0.8
   needFlip: 0
-  IsBoss: 1
+  IsBoss: 0
+  MaxAllies: 0
   EnemyAnimator: {fileID: 22100000, guid: f0f7f06c46af2a84e9b588cb08ca84ef, type: 2}
