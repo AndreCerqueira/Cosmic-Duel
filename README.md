@@ -9,7 +9,6 @@
 - **Strategic exploration** – Choose your path carefully as each jump costs fuel.
 - **Turn-based card combat** – Use your deck to battle unique enemies on each planet.
 - **Roguelite progression** – Each run offers different cards, routes, and challenges.
-- **Retro pixel art** – A nostalgic sci-fi atmosphere with detailed pixel visuals.
 
 ## 🎮 How to Play
 
@@ -17,7 +16,6 @@
 2. Select which planets to visit, weighing risks and rewards.
 3. Fight turn-based duels using your cards and strategy.
 4. Win battles to expand and improve your deck.
-5. Explore until your fuel runs out or you're defeated.
 
 ## 📦 Download
 
